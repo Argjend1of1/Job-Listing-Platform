@@ -51,9 +51,6 @@ class SessionController extends Controller
             'message' => 'Logged in successfully!',
             'user' => Auth::user()
         ]);
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
