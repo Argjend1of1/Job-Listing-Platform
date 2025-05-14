@@ -7,6 +7,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//Route::middleware('guest')->group(function () {
-//    Route::get('/login', [SessionController::class, 'index']);
-//});
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [SessionController::class, 'create']);
+});
