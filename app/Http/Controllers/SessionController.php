@@ -22,6 +22,7 @@ class SessionController extends Controller
     public function create()
     {
         return view('auth.login');
+
     }
 
     /**
@@ -50,6 +51,9 @@ class SessionController extends Controller
             'message' => 'Logged in successfully!',
             'user' => Auth::user()
         ]);
+    public function store(Request $request)
+    {
+        //
     }
 
     /**
