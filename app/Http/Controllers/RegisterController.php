@@ -52,14 +52,14 @@ class RegisterController extends Controller
                     ], 422);
                 }
 
-//                $category = Category::where('name', $userAttributes['category'])->first();
+                $category = Category::where('name', $userAttributes['category'])->first();
                 $userTableAttributes['role'] = 'employer';
 
                 $user = User::create($userTableAttributes);
                 // Create the employer record
                 $user->employer()->create([
                     'name' => $userAttributes['employer'],
-//                    'category_id' => $category->id,
+                    'category_id' => $category->id,
                 ]);
             }else {
                 $user = User::create($userTableAttributes);

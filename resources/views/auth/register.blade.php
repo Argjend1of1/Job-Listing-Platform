@@ -1,5 +1,5 @@
 <x-layout>
-{{--    <x-page-heading>Register</x-page-heading>--}}
+    <x-page-heading>Register</x-page-heading>
 
     <x-forms.form method="POST" id="registerForm" action="/api/register" enctype="multipart/form-data">
         <x-forms.input label="Your Name" name="name"/>

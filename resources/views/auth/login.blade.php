@@ -1,6 +1,5 @@
 <x-layout>
-{{--    <x-page-heading>Log In</x-page-heading>--}}
-
+    <x-page-heading>Log In</x-page-heading>
 
     <x-forms.form method="POST" action="/api/login" id="loginForm">
         <x-forms.input label="Email" name="email"/>

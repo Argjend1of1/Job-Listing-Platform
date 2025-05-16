@@ -8,6 +8,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class);
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [SessionController::class, 'create']);
+    Route::get('/login', [SessionController::class, 'create'])->name('login');
     Route::get('/register', [RegisterController::class, 'create']);
 });

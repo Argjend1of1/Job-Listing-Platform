@@ -13,7 +13,13 @@ class SessionController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $employer = Auth::user()->employer;
+
+        return response()->json([
+            'user' => $user,
+            'employer' => $employer,
+        ]);
     }
 
     /**
@@ -22,7 +28,6 @@ class SessionController extends Controller
     public function create()
     {
         return view('auth.login');
-
     }
 
     /**
