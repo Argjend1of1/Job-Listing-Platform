@@ -85,8 +85,14 @@ class SessionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        Auth::guard('web')->logout(); // explicitly log out via the session-based guard
+
+        $request->session()->invalidate();
+
+        return response()->json([
+            'message' => 'Successfully logged out!'
+        ]);
     }
 }

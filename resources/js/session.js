@@ -6,6 +6,8 @@ import {
     userLinks,
     superEmployerLinks
 } from "./reusableFunctions/generatingHTML/sessionLinksGenerate.js";
+import {getCookieValue} from "./reusableFunctions/getCookie.js";
+import {gotoRoute} from "./reusableFunctions/goToRoute.js";
 
 const excludedPaths = ['/login', '/register'];
 
@@ -50,7 +52,17 @@ if(!excludedPaths.includes(window.location.pathname)) {
 
             initializeDropdown();
 
-        //     logout left to be implemented
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await fetch('/api/logout', {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-XSRF-TOKEN': decodeURIComponent(getCookieValue('XSRF-TOKEN'))
+                    }
+                });
+                gotoRoute('/');
+            });
 
         } catch (error) {
             console.log('User not authenticated. ' + error);

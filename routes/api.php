@@ -14,4 +14,5 @@ Route::middleware(['guest:sanctum'])->group(function () {
 //for routes that will be role protected, for example admin:
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [SessionController::class, 'index']);
+    Route::delete('/logout', [SessionController::class, 'destroy']);
 });
