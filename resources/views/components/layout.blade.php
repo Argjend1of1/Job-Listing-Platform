@@ -65,7 +65,7 @@
     'resources/js/session.js',
 //    'resources/js/dashboard/index.js'
 ])
-{{--@stack('scripts')--}}
+@stack('scripts')
 </body>
 </html>
 
