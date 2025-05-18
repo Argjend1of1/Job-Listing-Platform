@@ -25,7 +25,7 @@ class HomeController extends Controller
         return view('index', [
             'topJobs' => $topJobs ?? null,
             'otherJobs' => $otherJobs ?? null,
-            'tags' => Tag::latest()->simplePaginate(3)
+            'tags' => Tag::latest()->simplePaginate(6)
         ]);
     }
 }

@@ -3,31 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\JobRequest;
+use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = $request->input('q');
+
+//        query => starts a query builder chain
+        $jobsQuery = Job::query();
+
+        if ($query) {
+            $this->searchQuery($jobsQuery, $query);
+
+        } else {
+            $jobsQuery->latest(); // Sort by created_at DESC
+        }
+        $jobs = $jobsQuery->simplePaginate(12);
+
+        return view('jobs.index', compact('jobs', 'query'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('jobs.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(JobRequest $request)
     {
         $attributes = $request->validated();
@@ -57,12 +62,8 @@ class JobController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    public function show(Job $job) {
+        return view('jobs.show', compact('job'));
     }
 
     /**
@@ -87,5 +88,47 @@ class JobController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function top(Request $request) {
+        $query = $request->input('q');
+        $jobsQuery = Job::where('top', true);
+
+        if($query) {
+            $this->searchQuery($jobsQuery, $query);
+        }else {
+            $jobsQuery->latest();
+        }
+
+        $jobs = $jobsQuery->simplePaginate(12);
+
+        return view('jobs.top', compact('jobs', 'query'));
+    }
+
+    public function more(Request $request) {
+        $query = $request->input('q');
+        $jobsQuery = Job::where('top', false);
+
+        if($query) {
+            $this->searchQuery($jobsQuery, $query);
+        }else {
+            $jobsQuery->latest();
+        }
+
+        $jobs = $jobsQuery->simplePaginate(12);
+
+        return view('jobs.more', compact('jobs', 'query'));
+    }
+
+    public function searchQuery($jobsQuery, $query) {
+        return $jobsQuery->where(function ($q) use ($query) {
+            $q->where('title', 'like', "%$query%")
+                ->orWhere('company', 'like', "%$query%")
+                ->orWhere('location', 'like', "%$query%")
+                ->orWhere('schedule', 'like', "%$query%")
+                ->orWhere('about', 'like', "%$query%");
+        })->orWhereHas('employer', function ($q) use ($query) {
+            $q->where('name', 'like', "%$query%");
+        });
     }
 }
