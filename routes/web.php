@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PremiumEmployerController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
@@ -31,6 +32,10 @@ Route::get('/tags/{tag:name}', TagController::class);//{tag:name} - frontend
 Route::middleware('guest')->group(function () {
     Route::get('/login', [SessionController::class, 'create'])->name('login');
     Route::get('/register', [RegisterController::class, 'create']);
+});
+
+Route::middleware(['auth', 'role:user'])->group(function () {
+    Route::get('/resume', [ResumeController::class, 'index']);
 });
 
 //authenticated with selected roles
