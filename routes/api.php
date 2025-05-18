@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployerController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PremiumEmployerController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -45,4 +47,10 @@ Route::middleware(['auth:sanctum', 'role:admin,superadmin'])->group(function () 
     Route::patch('/premiumEmployers/{id}', [PremiumEmployerController::class, 'update']);
 
     Route::delete('/jobs/{job}/destroy', [JobController::class, 'destroy']);
+});
+
+//authenticated superadmin
+Route::middleware(['auth:sanctum', 'role:superadmin'])->group(function () {
+    Route::patch('/admins/{id}', [AdminController::class, 'update']);
+    Route::patch('/admins/create/{user}', [UserController::class, 'update']);
 });
