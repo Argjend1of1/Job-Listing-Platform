@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
@@ -12,6 +13,11 @@ Route::get('/', HomeController::class);
 Route::middleware('guest')->group(function () {
     Route::get('/login', [SessionController::class, 'create'])->name('login');
     Route::get('/register', [RegisterController::class, 'create']);
+});
+
+Route::middleware(['auth', 'role:user,employer,superemployer,admin'])->group(function () {
+    Route::get('/account', [AccountController::class, 'index']);
+    Route::get('/account/edit', [AccountController::class, 'edit']);
 });
 
 //authenticated employer, superemployer
