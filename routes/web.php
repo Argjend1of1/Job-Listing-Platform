@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
@@ -37,6 +38,9 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/resume', [ResumeController::class, 'index']);
+    Route::get('/bookmarks', [BookmarkController::class, 'index']);
+
+    Route::get('/jobs/{job}/bookmark', [BookmarkController::class, 'show']);
 });
 
 //authenticated with selected roles

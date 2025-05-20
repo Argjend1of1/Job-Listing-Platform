@@ -11,6 +11,7 @@ export function userLinks(user) {
                              class="absolute bg-black border-1 border-gray-800 right-0 mt-2 w-48 rounded-md shadow-lg z-50 transition-all duration-200 ease-out transform scale-95 opacity-0 pointer-events-none">
                             <a href="/account" id="userDashboard" class="block border-b border-b-gray-800 px-4 py-2 text-white hover:bg-gray-800 focus:bg-gray-900">Account</a>
                             <a href="/resume" class="block border-b border-b-gray-800 px-4 py-2 text-white hover:bg-gray-800 focus:bg-gray-900">Upload Resume</a>
+                            <a href="/bookmarks" class="block border-b border-b-gray-800 px-4 py-2 text-white hover:bg-gray-800 focus:bg-gray-900">Bookmarks</a>
                             <button id="logoutBtn" class="w-full text-left block px-4 py-2 text-red-400 hover:bg-red-900 cursor-pointer focus:bg-red-950">Log Out</button>
                         </div>
                 </div>

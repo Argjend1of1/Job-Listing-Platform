@@ -2,9 +2,12 @@ import {confirmAction} from "../reusableFunctions/confirmAction.js";
 import {getCookieValue} from "../reusableFunctions/getCookie.js";
 import {showError, showSuccess} from "../reusableFunctions/alertUser.js";
 import {gotoRoute} from "../reusableFunctions/gotoRoute.js";
+import {deleteRequest} from "../reusableFunctions/fetchRequest.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     const applyButton = document.getElementById('applyButton');
+    const bookmarkButton = document.getElementById('bookmarkButton');
+    const removeBookmark = document.getElementById('removeBookmark');
 
     const xsrfToken = decodeURIComponent(getCookieValue('XSRF-TOKEN'));
 
@@ -48,6 +51,72 @@ document.addEventListener('DOMContentLoaded', async () => {
                 gotoRoute('/', 3000);
             }catch (e) {
                 showError(e.message || 'Unexpected Error!');
+            }
+        })
+    }
+
+    if(bookmarkButton) {
+        bookmarkButton.addEventListener('click', async () => {
+            const {jobId} = bookmarkButton.dataset;
+            console.log(jobId);
+
+            const confirm = await confirmAction(
+                'Are you sure you want to bookmark this job ?',
+                'Yes, I am sure!'
+            );
+            if(!confirm) return;
+
+            try {
+                const response = await fetch(`/api/jobs/${jobId}/bookmark`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-XSRF-TOKEN': xsrfToken
+                    }
+                });
+                const result = await response.json();
+                console.log(result);
+                if(!response.ok) {
+                    throw result;
+                }
+
+                showSuccess(result.message);
+                gotoRoute('/', 3000)
+            }catch (e){
+                showError(e.message || 'Something went wrong.');
+                gotoRoute('/bookmarks', 3000)
+            }
+        })
+    }
+
+    if(removeBookmark) {
+        removeBookmark.addEventListener('click', async () => {
+            const {jobId} = removeBookmark.dataset;
+            console.log(jobId);
+
+            const confirm = await confirmAction(
+                'Are you sure you want to remove this bookmark ?',
+                'Yes, I am sure!'
+            );
+            if(!confirm) return;
+
+            try {
+                const response = await deleteRequest(
+                    `/api/jobs/${jobId}/bookmark`, xsrfToken
+                );
+                const result = await response.json();
+                console.log(result);
+                if(!response.ok) {
+                    throw result;
+                }
+
+                showSuccess(result.message);
+                gotoRoute('/');
+            }catch (e){
+                showError(e.message || 'Something went wrong.');
+                gotoRoute('/', 3000);
             }
         })
     }
