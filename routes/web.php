@@ -49,6 +49,9 @@ Route::middleware(['auth', 'role:employer,superemployer'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/dashboard/edit/{job}', [DashboardController::class, 'edit']);
     Route::get('/jobs/create', [JobController::class, 'create']);
+
+//    will hit this route, when clicking the download button
+    Route::get('/resume/{user}/{job}', [ResumeController::class, 'show'])->name('resume.download');
 });
 
 //authenticated admin, superadmin

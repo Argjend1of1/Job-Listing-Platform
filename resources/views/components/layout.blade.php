@@ -1,4 +1,5 @@
-<!doctype html>
+@php use Illuminate\Support\Facades\Vite; @endphp
+    <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,7 +19,7 @@
     <nav class="flex justify-between items-center py-5 border-b border-white/10">
         <div>
             <a href="/">
-                <img src="" alt="logo"/>
+                <img src="{{Vite::asset('resources/images/platform-logo.webp') }}" alt="logo" width="45px" height="45px" class="rounded-full bg-transparent"/>
             </a>
         </div>
 
