@@ -9,6 +9,7 @@ use App\Http\Controllers\EmployerController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PremiumEmployerController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
@@ -24,15 +25,15 @@ Route::middleware(['guest:sanctum'])->group(function () {
     Route::post('/register', [RegisterController::class, 'store']);
 });
 
-Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
-    Route::post('/resume', [ResumeController::class, 'store']);
-    Route::delete('/jobs/{job}/bookmark', [BookmarkController::class, 'destroy']);
-});
-
 //for routes that will be role protected, for example admin:
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [SessionController::class, 'index']);
     Route::delete('/logout', [SessionController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
+    Route::post('/resume', [ResumeController::class, 'store']);
+    Route::delete('/jobs/{job}/bookmark', [BookmarkController::class, 'destroy']);
 });
 
 Route::middleware([
@@ -42,6 +43,8 @@ Route::middleware([
     Route::get('/account/edit', [AccountController::class, 'show']);
     Route::patch('/account/edit', [AccountController::class, 'update']);
     Route::delete('/account/edit', [AccountController::class, 'destroy']);
+
+    Route::post('/jobs/{job}/report', [ReportController::class, 'store']);
 });
 
 Route::middleware(['auth:sanctum', 'role:employer,superemployer'])->group(function () {
@@ -58,11 +61,12 @@ Route::middleware(['auth:sanctum', 'role:admin,superadmin'])->group(function () 
     Route::delete('/employers/{id}', [EmployerController::class, 'destroy']);
     Route::patch('/premiumEmployers/{id}', [PremiumEmployerController::class, 'update']);
 
+//    !!not implemented yet!!
     Route::delete('/jobs/{job}/destroy', [JobController::class, 'destroy']);
 });
 
 //authenticated superadmin
 Route::middleware(['auth:sanctum', 'role:superadmin'])->group(function () {
-    Route::patch('/admins/{id}', [AdminController::class, 'update']);
     Route::patch('/admins/create/{user}', [UserController::class, 'update']);
+    Route::patch('/admins/{id}', [AdminController::class, 'update']);
 });

@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const applyButton = document.getElementById('applyButton');
     const bookmarkButton = document.getElementById('bookmarkButton');
     const removeBookmark = document.getElementById('removeBookmark');
+    const reportButton = document.getElementById('reportButton');
 
     const xsrfToken = decodeURIComponent(getCookieValue('XSRF-TOKEN'));
 
@@ -119,5 +120,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                 gotoRoute('/', 3000);
             }
         })
+    }
+
+    if(reportButton) {
+        reportButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const {jobId} = reportButton.dataset;
+            console.log(jobId);
+
+            const confirm = await confirmAction(
+                'Are you sure you want to report this job ?',
+                'Yes, I am sure!'
+            );
+            if(!confirm) return;
+
+            try {
+                const response = await fetch(`/api/jobs/${jobId}/report`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-XSRF-TOKEN': xsrfToken
+                    }
+                });
+
+                const result = await response.json();
+                if(!response.ok) {
+                    showError(result.message);
+                }
+
+                showSuccess(result.message);
+                gotoRoute('/', 3000);
+            }catch (e) {
+                showError(e.message || 'Unexpected Error!');
+            }
+        });
     }
 })

@@ -12,12 +12,14 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PremiumEmployerController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+//accessible from everyone
 Route::get('/', HomeController::class);
 Route::get('/companies', [CompanyController::class, 'index']);
 Route::get('/companies/{id}/jobs', [CompanyController::class, 'show']);
@@ -31,11 +33,13 @@ Route::get('/jobs/{job}', [JobController::class, 'show']);
 
 Route::get('/tags/{tag:name}', TagController::class);//{tag:name} - frontend
 
+//guests
 Route::middleware('guest')->group(function () {
     Route::get('/login', [SessionController::class, 'create'])->name('login');
     Route::get('/register', [RegisterController::class, 'create']);
 });
 
+//users only
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/resume', [ResumeController::class, 'index']);
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
@@ -63,6 +67,8 @@ Route::middleware(['auth', 'role:employer,superemployer'])->group(function () {
 Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     Route::get('/employers', [EmployerController::class, 'index']);
     Route::get('/premiumEmployers', [PremiumEmployerController::class, 'index']);
+
+    Route::get('/reports', [ReportController::class, 'index']);
 });
 
 //authenticated superadmin
