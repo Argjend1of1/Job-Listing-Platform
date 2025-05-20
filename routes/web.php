@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
@@ -50,7 +51,7 @@ Route::middleware(['auth', 'role:employer,superemployer'])->group(function () {
     Route::get('/dashboard/edit/{job}', [DashboardController::class, 'edit']);
     Route::get('/jobs/create', [JobController::class, 'create']);
 
-//    will hit this route, when clicking the download button
+    Route::get('/dashboard/{job}/applicants', [ApplicationController::class, 'show']);
     Route::get('/resume/{user}/{job}', [ResumeController::class, 'show'])->name('resume.download');
 });
 

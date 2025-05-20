@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployerController;
 use App\Http\Controllers\JobController;
@@ -11,6 +12,10 @@ use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+
+// all users so we can show a message to the user that he must be logged in
+// to apply, and have a resume uploaded
+Route::post('/jobs/{id}/apply', [ApplicationController::class, 'store']);
 
 
 Route::middleware(['guest:sanctum'])->group(function () {
