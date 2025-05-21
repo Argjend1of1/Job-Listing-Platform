@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bookmarkButton = document.getElementById('bookmarkButton');
     const removeBookmark = document.getElementById('removeBookmark');
     const reportButton = document.getElementById('reportButton');
+    const deleteButton = document.getElementById('deleteButton');
 
     const xsrfToken = decodeURIComponent(getCookieValue('XSRF-TOKEN'));
 
@@ -156,5 +157,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showError(e.message || 'Unexpected Error!');
             }
         });
+    }
+
+    if(deleteButton) {
+        deleteButton.addEventListener('click', async () => {
+            const {jobId} = deleteButton.dataset;
+            console.log(jobId);
+
+            const confirm = await confirmAction(
+                'Are you sure you want to remove this job ? ',
+                'Yes, I am sure!'
+            );
+            if(!confirm) return;
+
+            try {
+                const response = await fetch(`/api/jobs/${jobId}/destroy`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-XSRF-TOKEN': xsrfToken
+                    }
+                })
+                console.log(response);
+                const result = await response.json();
+                console.log(result);
+
+                if(!response.ok) {
+                    showError(result.message)
+                }
+
+                showSuccess(result.message);
+                gotoRoute('/');
+            }catch (e) {
+                showError(e.message || 'Unexpected Error. Please try again!');
+            }
+        })
     }
 })

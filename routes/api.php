@@ -61,7 +61,6 @@ Route::middleware(['auth:sanctum', 'role:admin,superadmin'])->group(function () 
     Route::delete('/employers/{id}', [EmployerController::class, 'destroy']);
     Route::patch('/premiumEmployers/{id}', [PremiumEmployerController::class, 'update']);
 
-//    !!not implemented yet!!
     Route::delete('/jobs/{job}/destroy', [JobController::class, 'destroy']);
 });
 

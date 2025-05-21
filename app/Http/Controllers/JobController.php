@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\JobRequest;
 use App\Models\Job;
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -66,28 +67,28 @@ class JobController extends Controller
         return view('jobs.show', compact('job'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(Job $job)
     {
-        //
-    }
+        $user = Auth::user();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        if (!in_array($user->role, ['admin', 'superadmin'])) {
+            return response()->json([
+                'message' => 'Unauthorized.'
+            ], 403);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+//        in case a report for this job was made, also remove it.
+        $reported = Report::where('job_id', $job->id)->first();
+
+        if($reported !== null) {
+            $reported->delete();
+        }
+
+        $job->delete();
+
+        return response()->json([
+            'message' => 'Job deleted successfully!'
+        ]);
     }
 
     public function top(Request $request) {
