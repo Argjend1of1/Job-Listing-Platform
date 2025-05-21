@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PremiumEmployerController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ReportController;
@@ -37,6 +38,9 @@ Route::get('/tags/{tag:name}', TagController::class);//{tag:name} - frontend
 Route::middleware('guest')->group(function () {
     Route::get('/login', [SessionController::class, 'create'])->name('login');
     Route::get('/register', [RegisterController::class, 'create']);
+
+    Route::get('/forgot-password', [PasswordResetController::class, 'index']);
+    Route::get('/reset-password', [PasswordResetController::class, 'edit']);
 });
 
 //users only

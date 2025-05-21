@@ -5,6 +5,12 @@
         <x-forms.input label="Email" name="email"/>
         <x-forms.input type="password" label="Password" name="password"/>
 
+        <div class="mt-4 text-sm">
+            <a href="/forgot-password" class="text-blue-500 hover:underline">
+                Forgot your password?
+            </a>
+        </div>
+
         <p class="text-red-500" id="responseMessage"></p>
 
         <x-forms.button type="submit">Log In</x-forms.button>
