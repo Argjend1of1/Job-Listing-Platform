@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\Password;
@@ -19,18 +20,18 @@ class RegisterRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
             'name' => ['required'],
-            'category' => ['nullable'],
             'email' => ['required', 'email', 'unique:users, email'],
             'password' => ['required', 'confirmed', Password::min(6)],
             'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])],
             'role' => ['nullable'],
             'employer' => ['nullable'],
+            'category' => ['nullable'],
         ];
     }
 }

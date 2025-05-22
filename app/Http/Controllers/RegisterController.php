@@ -16,7 +16,6 @@ class RegisterController extends Controller
     }
     public function store(RegisterRequest $request)
     {
-        DB::beginTransaction();
         try {
             $userAttributes = $request->validated();
 
@@ -50,18 +49,15 @@ class RegisterController extends Controller
                 $user = User::create($userTableAttributes);
             }
 
-            DB::commit();
-
             return response()->json([
                 'message' => 'Successfully Registered!',
                 'user' => $user,
                 'employer' => $user->employer ?? null
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json([
                 'message' => $e->getMessage() ?? 'User already exists!'
-            ], 500);
+            ], 409);
         }
     }
 }
