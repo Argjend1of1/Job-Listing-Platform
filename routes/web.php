@@ -20,19 +20,6 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-//accessible from everyone
-Route::get('/', HomeController::class);
-Route::get('/companies', [CompanyController::class, 'index']);
-Route::get('/companies/{id}/jobs', [CompanyController::class, 'show']);
-
-Route::get('/categories/{name}', [CategoryController::class, 'index']);
-
-Route::get('/jobs', [JobController::class, 'index']);
-Route::get('/jobs/top', [JobController::class, 'top']);
-Route::get('/jobs/more', [JobController::class, 'more']);
-Route::get('/jobs/{job}', [JobController::class, 'show']);
-
-Route::get('/tags/{tag:name}', TagController::class);//{tag:name} - frontend
 
 //guests
 Route::middleware('guest')->group(function () {
@@ -80,3 +67,16 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/admins', [AdminController::class, 'index']);
     Route::get('/admins/create', [UserController::class, 'index']);
 });
+//accessible from everyone
+Route::get('/', HomeController::class);
+Route::get('/companies', [CompanyController::class, 'index']);
+Route::get('/companies/{id}/jobs', [CompanyController::class, 'show']);
+
+Route::get('/categories/{name}', [CategoryController::class, 'index']);
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/top', [JobController::class, 'top']);
+Route::get('/jobs/more', [JobController::class, 'more']);
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+
+Route::get('/tags/{tag:name}', TagController::class);//{tag:name} - frontend
