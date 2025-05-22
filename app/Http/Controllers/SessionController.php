@@ -32,8 +32,10 @@ class SessionController extends Controller
             ], 422);
         }
 
-        $request->session()->regenerate();
-
+//        to allow testing the user logging in.
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 //        precaution
         if (!Auth::user()) {
             return response()->json([

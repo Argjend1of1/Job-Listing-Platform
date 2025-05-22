@@ -29,6 +29,6 @@ class AppServiceProvider extends ServiceProvider
             $view->with('navbarCategories', Category::all());
         });
 
-        DB::statement('PRAGMA foreign_keys = ON;');
+//        DB::statement('PRAGMA foreign_keys = ON;');
     }
 }

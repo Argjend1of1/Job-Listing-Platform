@@ -6,20 +6,25 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\JsonResponse;
 
 class GuestMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param Closure(Request): (Response) $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Auth::check()) {
+        if (Auth::check()) {
+            // Force a JSON response if request is from API
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Already authenticated.'
+                ], 403);
+            }
+
+            // Fallback for web routes
             abort(403, 'Already authenticated.');
         }
 
         return $next($request);
     }
 }
+
