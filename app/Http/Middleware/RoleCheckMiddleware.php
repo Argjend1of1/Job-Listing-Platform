@@ -14,7 +14,16 @@ class RoleCheckMiddleware
 
     public function handle($request, Closure $next, ...$roles)
     {
-        if (!in_array($request->user()->role, $roles)) {
+
+        if (!Auth::user() || !in_array(Auth::user()->role, $roles)) {
+            // If it's an API request, return 403
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Unauthorized: Insufficient permissions.'
+                ], 403);
+            }
+
+            // Otherwise, redirect for web requests
             return redirect('/');
         }
 
