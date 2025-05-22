@@ -13,15 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Superadmin',
-            'email' => 'superadmin@job-platform.com',
-            'password' => bcrypt('asdasd'),
-            'logo' => 'https://picsum.photos/200?random=' . rand(1, 1000),
-            'role' => 'superadmin',
-        ]);
-
         $this->call([
+            SuperAdminSeeder::class,
             CategorySeeder::class,
             JobSeeder::class
         ]);
