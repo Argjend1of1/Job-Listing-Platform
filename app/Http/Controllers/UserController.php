@@ -31,20 +31,22 @@ class UserController extends Controller
     {
         if(!$user) {
             return response()->json([
-                'message' => 'Could not find user. Please refresht and try again!'
+                'message' => 'Could not find user. Please refresh and try again!'
             ], 404);
         }
 
-        // Optionally check if the user is already an admin
+        // Precautionary check if the user is already an admin
         if ($user->role === 'admin') {
-            return response()->json(['message' => 'User is already an admin.'], 400);
+            return response()->json([
+                'message' => 'User is already an admin.'
+            ], 400);
         }
 
         $user->role = $request->input('role', 'admin'); // default to 'admin' if role not sent
         $user->save();
 
         return response()->json([
-            'message' => 'User promoted successfully!',
+            'message' => 'User Promoted Successfully!',
             'user' => $user
         ]);
     }

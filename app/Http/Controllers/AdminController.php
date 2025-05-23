@@ -33,7 +33,6 @@ class AdminController extends Controller
 
     public function update(string $id)
     {
-        DB::beginTransaction();
         try {
             $user = User::findOrFail($id);
             if(!$user) {
@@ -44,13 +43,10 @@ class AdminController extends Controller
             $user->role = 'user';
             $user->save();
 
-            DB::commit();
-
             return response()->json([
                 'message' => "Admin Demoted Successfully!"
             ]);
         }catch (\Exception $e) {
-            DB::rollBack();
             return response()->json([
                 'message' => "Could not demote admin. Error : " . $e
             ]);

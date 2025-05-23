@@ -67,6 +67,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/admins', [AdminController::class, 'index']);
     Route::get('/admins/create', [UserController::class, 'index']);
 });
+
 //accessible from everyone
 Route::get('/', HomeController::class);
 Route::get('/companies', [CompanyController::class, 'index']);
