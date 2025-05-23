@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 class DashboardController extends Controller
 {
     public function index()
@@ -18,7 +17,9 @@ class DashboardController extends Controller
 
         return response()->json([
             'user' => $user,
-            'jobs' => $user->employer->job
+            'jobs' => $user->employer->job,
+//            just for testing
+            'message' => '(super)employer can access dashboard!'
         ]);
     }
 
@@ -59,6 +60,28 @@ class DashboardController extends Controller
     }
 
     public function destroy(Job $job) {
+//        to make sure only authenticated users can proceed on the next step
+        $user = Auth::user();
+        if(!$user) {
+            return response()->json([
+                'message' => 'Unauthorized to complete this action!'
+            ], 403);
+        }
+
+//        check if he is an employer
+        if(!$user->employer) {
+            return response()->json([
+                'message' => 'Unauthorized to complete this action!'
+            ], 403);
+        }
+
+//        if authenticated job must belong to you
+        if($user->employer->id !== $job->employer->id) {
+            return response()->json([
+                'message' => "Unauthorized to remove others' jobs!"
+            ], 403);
+        }
+
         $job->delete();
 
         return response()->json([
