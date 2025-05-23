@@ -54,6 +54,7 @@ class JobController extends Controller
             }
         }
 
+//        prevent lazy loading (n + 1 problem)
         $job->load('employer');
         $job->load('tags');
 

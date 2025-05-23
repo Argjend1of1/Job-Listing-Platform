@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Category;
+use App\Models\Employer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Employer>
+ * @extends Factory<Employer>
  */
 class EmployerFactory extends Factory
 {
@@ -16,8 +17,14 @@ class EmployerFactory extends Factory
      *
      * @return array<string, mixed>
      */
+
+
     public function definition(): array
     {
+        //    for testing only:
+        Category::create([
+            'name' => fake()->unique()->name()
+        ]);
         return [
             'name' => fake()->name(),
             'category_id' => Category::inRandomOrder()->first()->id,
