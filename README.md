@@ -52,32 +52,45 @@ GitHub for version control and PRs
 GitHub Projects for task management
 
 ## 📁 Project Setup
-1. Clone & Navigate
-`git clone https://github.com/yourusername/job-listing-platform.git`
-`cd job-listing-platform`
+ 1. Clone & Navigate 
+<pre>
+    git clone https://github.com/yourusername/job-listing-platform.git 
+    cd job-listing-platform
+</pre>
 2. Install Dependencies
-`composer install`
-`npm install && npm run build`
+<pre>
+    composer install
+    npm install && npm run build
+</pre>
 3. Configure Environment
-`cp .env.example .env`
-`php artisan key:generate`
+<pre>
+    cp .env.example .env
+    php artisan key:generate
+</pre>
 
 Set database connection in .env:
-DB_CONNECTION=sqlite
-DB_DATABASE=/absolute/path/to/database.sqlite
+<pre>
+    DB_CONNECTION=sqlite
+    DB_DATABASE=/absolute/path/to/database.sqlite
+</pre>
 
 Or switch to MySQL:
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_DATABASE=your_db
-DB_USERNAME=root
-DB_PASSWORD=
+<pre>
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_DATABASE=your_db
+    DB_USERNAME=root
+    DB_PASSWORD=
+</pre>
 
 4. Migrate & Seed Database
-`php artisan migrate --seed`
+<pre>
+    php artisan migrate --seed
+</pre>
 5. Serve the App
-`php artisan serve`
-Access: http://localhost:8000
+<pre>
+    php artisan serve
+</pre>
 
 ## 👤 User Roles & Access
 Role	            Abilities
@@ -102,7 +115,9 @@ PATCH /api/users/{id}/role	Promote user to admin
 JSON format used for all responses
 
 🧪 Running Tests
-`php artisan test`
+<pre>
+    php artisan test
+</pre>
 You can find tests in:
 **tests/Feature/**
 
@@ -123,9 +138,11 @@ You can find tests in:
 This project is licensed under the MIT License.
 
 ## 👨‍💻 Contributors
-Made with ❤️ by:
+Made by:
+<pre>
     Argjend Nimanaj
     Alfred Palokaj
+</pre>
     
 Feel free to contribute via pull request!
 
