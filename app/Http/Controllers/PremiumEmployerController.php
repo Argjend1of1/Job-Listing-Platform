@@ -31,7 +31,7 @@ class PremiumEmployerController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id)
+    public function update(string $id)
     {
         $employer = User::findOrFail($id);
         if(!$employer) {
@@ -44,7 +44,7 @@ class PremiumEmployerController extends Controller
         $employer->save();
 
         return response()->json([
-            'message' => 'User Demoted Successfully!'
+            'message' => 'Superemployer Demoted Successfully!'
         ]);
     }
 

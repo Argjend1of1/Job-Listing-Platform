@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Employer;
 use App\Models\User;
 use Illuminate\Http\Request;
-
 class EmployerController extends Controller
 {
     /**
@@ -60,6 +59,8 @@ class EmployerController extends Controller
         $user->delete();
         $employer->delete();
 
-        return response()->json(['message' => 'Employer deleted successfully!']);
+        return response()->json([
+            'message' => 'Employer deleted successfully!'
+        ]);
     }
 }

@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .forEach((button) => {
             button.addEventListener('click', async (e) => {
                 e.preventDefault();
-                const {employerId} = button.dataset;
+                const {userId} = button.dataset;
 
                 const xsrfToken = decodeURIComponent(getCookieValue('XSRF-TOKEN'));
                 const confirm = await confirmAction(
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 try {
                     const response = await patchRoleRequest(
-                        `/api/premiumEmployers/${employerId}`,
+                        `/api/premiumEmployers/${userId}`,
                         xsrfToken, 'employer'
                     );
 

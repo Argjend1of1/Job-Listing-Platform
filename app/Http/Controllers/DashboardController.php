@@ -50,8 +50,6 @@ class DashboardController extends Controller
             'salary' => $request->salary
         ]);
 
-//      send an email to the user through queues
-
         return response()->json([
             'message' => 'Job updated successfully!',
             'job'     => $job->fresh()->load('tags','employer'),
@@ -60,20 +58,7 @@ class DashboardController extends Controller
     }
 
     public function destroy(Job $job) {
-//        to make sure only authenticated users can proceed on the next step
         $user = Auth::user();
-        if(!$user) {
-            return response()->json([
-                'message' => 'Unauthorized to complete this action!'
-            ], 403);
-        }
-
-//        check if he is an employer
-        if(!$user->employer) {
-            return response()->json([
-                'message' => 'Unauthorized to complete this action!'
-            ], 403);
-        }
 
 //        if authenticated job must belong to you
         if($user->employer->id !== $job->employer->id) {
