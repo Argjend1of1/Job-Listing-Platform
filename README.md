@@ -141,7 +141,6 @@ This project is licensed under the MIT License.
 Made by:
 <pre>
     Argjend Nimanaj
-    Alfred Palokaj
 </pre>
     
 Feel free to contribute via pull request!
