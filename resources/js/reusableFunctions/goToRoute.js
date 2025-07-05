@@ -1,5 +1,5 @@
-export function gotoRoute(route) {
+export function gotoRoute(route, timeout = 1000) {
     setTimeout(() => {
         window.location.href = route;
-    }, 1000);
+    }, timeout);
 }

@@ -1,29 +1,29 @@
-export function showSuccess(message = 'Success!') {
+export function showSuccess(message = 'Success!', timer = 3000) {
     Swal.fire({
         icon: 'success',
         title: 'Success!',
         text: message,
-        timer: 3000,
+        timer: timer,
         showConfirmButton: false
     });
 }
 
-export function showError(message = 'Something went wrong.') {
+export function showError(message = 'Something went wrong.', timer = 3000) {
     Swal.fire({
         icon: 'error',
         title: 'Oops!',
         text: message,
-        timer: 3000,
+        timer: timer,
         showConfirmButton: false
     });
 }
 
-export function showInfo(message = '') {
+export function showInfo(message = '', timer = 3000) {
     Swal.fire({
         icon: 'info',
         title: 'Info',
         text: message,
-        timer: 3000,
+        timer: timer,
         showConfirmButton: false
     });
 }

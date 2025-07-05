@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\JobRequest;
 use App\Models\Job;
 use App\Models\Report;
+use App\Traits\JobFiltering;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
+    use JobFiltering;
     public function index(Request $request)
     {
         $query = $request->input('q');
@@ -114,7 +116,10 @@ class JobController extends Controller
         $query = $request->input('q');
         $jobsQuery = Job::query();
         if(Auth::user()) {
-            $jobsQuery->where('category_id', Auth::user()->category_id);
+            $excludedIds = $this->removeFromDisplay();
+            $jobsQuery
+                ->where('category_id', Auth::user()->category_id)
+                ->whereNotIn('id', $excludedIds);
         }
         $jobsQuery->where('top', $top);
 

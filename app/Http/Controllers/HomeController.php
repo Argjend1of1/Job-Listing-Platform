@@ -2,21 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Job;
 use App\Models\Tag;
+use App\Traits\JobFiltering;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
+    use JobFiltering;
     public function __invoke()
     {
-        //display jobs based on the user's selected category, if the user is authenticated, else display without that query
+        //display jobs based on the logged user's selected category,
         $queryTop = Job::query();
         $queryOther = Job::query();
         if(Auth::user()) {
-            $queryTop->where('category_id', Auth::user()->category_id);
-            $queryOther->where('category_id', Auth::user()->category_id);
+            $excludedIds = $this->removeFromDisplay();
+            $queryTop
+                ->where('category_id', Auth::user()->category_id)
+                ->whereNotIn('id', $excludedIds);
+
+            $queryOther
+                ->where('category_id', Auth::user()->category_id)
+                ->whereNotIn('id', $excludedIds);
         }
 
         $topJobs = $queryTop->where('top', true)

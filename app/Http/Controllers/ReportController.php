@@ -34,7 +34,7 @@ class ReportController extends Controller
 
         if ($existingReport) {
             return response()->json([
-                'message' => 'You have already reported this job.'
+                'message' => 'You have already reported this job. Our admins will check it shortly.'
             ], 409);
         }
 

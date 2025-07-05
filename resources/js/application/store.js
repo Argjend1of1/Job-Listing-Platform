@@ -1,6 +1,6 @@
 import {confirmAction} from "../reusableFunctions/confirmAction.js";
 import {getCookieValue} from "../reusableFunctions/getCookie.js";
-import {showError, showSuccess} from "../reusableFunctions/alertUser.js";
+import {showError, showInfo, showSuccess} from "../reusableFunctions/alertUser.js";
 import {gotoRoute} from "../reusableFunctions/gotoRoute.js";
 import {deleteRequest} from "../reusableFunctions/fetchRequest.js";
 
@@ -147,9 +147,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 const result = await response.json();
+                console.log(result)
                 if(!response.ok) {
-                    showError(result.message);
+                    showInfo(result.message, 3000);
+                    gotoRoute('/', 3000);
+                    return;
                 }
+                console.log(response);
 
                 showSuccess(result.message);
                 gotoRoute('/', 3000);
