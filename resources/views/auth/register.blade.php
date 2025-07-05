@@ -7,23 +7,26 @@
         <x-forms.input type="password" label="Password" name="password"/>
         <x-forms.input type="password" label="Password Confirmation" name="password_confirmation"/>
         <x-forms.input label="Profile Image" name="logo" type="file"/>
+        <x-forms.select class="text-white p-2" label="Category" name="category">
+            <x-forms.option value="">-Select a Category-</x-forms.option>
+            @foreach($categories as $category)
+                <x-forms.option value="{{$category->name}}">{{$category->name}}</x-forms.option>
+            @endforeach
+        </x-forms.select>
 
         <x-forms.divider/>
 
-        <x-forms.input label="Company Name" name="employer"/>
-        <x-forms.select class="text-white p-2" label="Category" name="category">
-            <x-forms.option value="">-Select a Category-</x-forms.option>
-            <x-forms.option value="Technology & IT">Technology & IT</x-forms.option>
-            <x-forms.option value="Healthcare & Life Sciences">Healthcare & Life Sciences</x-forms.option>
-            <x-forms.option value="Finance & Business">Finance & Business</x-forms.option>
-            <x-forms.option value="Education & Non-Profit">Education & Non-Profit</x-forms.option>
-            <x-forms.option value="Engineering & Industry">Engineering & Industry</x-forms.option>
-            <x-forms.option value="Retail & Consumer Services">Retail & Consumer Services</x-forms.option>
-            <x-forms.option value="Media & Design">Media & Design</x-forms.option>
-            <x-forms.option value="Environment & Infrastructure">Environment & Infrastructure</x-forms.option>
-            <x-forms.option value="Logistics & Transportation">Logistics & Transportation</x-forms.option>
-            <x-forms.option value="Sports & Recreation">Sports & Recreation</x-forms.option>
-        </x-forms.select>
+        <div class="mb-4">
+            <label for="is_company" class="inline-flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <input type="checkbox" id="is_company" name="is_company" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <span>I'm registering as a company</span>
+            </label>
+        </div>
+
+        <!-- Company Name Input - Initially hidden, shown when checkbox is selected via JS -->
+        <div id="companyNameInput" class="hidden transition-opacity duration-300">
+            <x-forms.input label="Company Name" name="employer" />
+        </div>
 
         <p id="responseMessage" class="mt-2"></p>
 
@@ -31,4 +34,5 @@
 
         @vite(['resources/js/auth/register.js'])
     </x-forms.form>
+
 </x-layout>

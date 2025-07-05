@@ -4,6 +4,10 @@ import {showResponseMessage} from "../reusableFunctions/showResponseMessage.js";
 import JustValidate from "just-validate";
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('is_company').addEventListener('change', ()  => {
+        document.getElementById('companyNameInput').classList.toggle('hidden');
+    });
+
     const form =
         document.getElementById('registerForm');
     if(!form) return;
@@ -81,27 +85,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorMessage: 'Logo must be less than 2MB',
             }
         ])
-        .addField('#employer', [
+        .addField('#category', [
             {
-                validator: (value, fields) => {
-                    const categoryValue = fields['#category'].elem.value;
-                    return (value === '' && categoryValue === '') || (value !== '' && categoryValue !== '');
-                },
-                errorMessage: 'Company and category must both be filled or both be empty',
-            },
+                rule: 'required',
+                errorMessage: 'Please specify the category!',
+            }
+        ])
+        .addField('#employer', [
             {
                 rule: 'minLength',
                 value: 3,
                 errorMessage: 'Company should contain at least 3 characters',
-            }
-        ])
-        .addField('#category', [
-            {
-                validator: (value, fields) => {
-                    const companyValue = fields['#employer'].elem.value;
-                    return (value === '' && companyValue === '') || (value !== '' && companyValue !== '');
-                },
-                errorMessage: 'Category and company must both be filled or both be empty',
             }
         ])
         .onSuccess(async (e) => {
@@ -129,10 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: formData
                 })
-                console.log(response);
 
                 const result = await response.json();
-                console.log(result);
+                console.log(result.message);
 
                 const responseToUser =
                     document.getElementById('responseMessage');

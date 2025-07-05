@@ -13,16 +13,16 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            'Technology & IT',
-            'Healthcare & Life Sciences',
-            'Finance & Business',
-            'Education & Non-Profit',
-            'Engineering & Industry',
-            'Retail & Consumer Services',
-            'Media & Design',
-            'Environment & Infrastructure',
-            'Logistics & Transportation',
-            'Sports & Recreation'
+            'Technology and IT',
+            'Healthcare and Life Sciences',
+            'Finance and Business',
+            'Education and Non-Profit',
+            'Engineering and Industry',
+            'Retail and Consumer Services',
+            'Media and Design',
+            'Environment and Infrastructure',
+            'Logistics and Transportation',
+            'Sports and Recreation'
         ];
 
         foreach ($categories as $category) {

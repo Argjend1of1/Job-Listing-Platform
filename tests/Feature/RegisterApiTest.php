@@ -11,24 +11,27 @@ uses(RefreshDatabase::class);
 test('user can register without employer fields', function () {
     Storage::fake('local');//simulate storage
 
+    Category::create(['name' => 'Teestttt']);
+
     $response = $this->postJson('/api/register', [
         'name' => 'Normal User',
-        'email' => 'user@example.com',
+        'email' => 'user1@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
         'logo' => UploadedFile::fake()->image('logo.png'),
-        'employer' => null //because it checks if null on controller
+        'category' => 'Teestttt',
+        'employer' => null //because it checks if null on controller || PRECAUTION!!
     ]);
 
     $response->assertStatus(200)
         ->assertJson([
             'message' => 'Successfully Registered!',
-            'user' => ['email' => 'user@example.com'],
+            'user' => ['email' => 'user1@example.com'],
             'employer' => null
         ]);
 
     $this->assertDatabaseHas('users', [
-        'email' => 'user@example.com',
+        'email' => 'user1@example.com',
         'role' => 'user'
     ]);
 });
@@ -36,7 +39,7 @@ test('user can register without employer fields', function () {
 test('user can register as an employer', function () {
     Storage::fake('local');
 
-    Category::create(['name' => 'test']);
+    Category::create(['name' => 'Test']);
 
     $response = $this->postJson('/api/register', [
         'name' => 'Normal User',
@@ -44,8 +47,8 @@ test('user can register as an employer', function () {
         'password' => 'password123',
         'password_confirmation' => 'password123',
         'logo' => UploadedFile::fake()->image('logo.png'),
-        'employer' => 'User Enterprise', //because it checks if null on controller
-        'category' => "test"
+        'category' => 'Test',
+        'employer' => 'User Enterprise' //because it checks if null on controller
     ]);
 
 //    dd($response);
@@ -58,29 +61,11 @@ test('user can register as an employer', function () {
         ]);
 });
 
-test('employer registration fails without category', function () {
-    Storage::fake('local');
-
-    $response = $this->postJson('/api/register', [
-        'name' => 'Company Admin',
-        'email' => 'employer2@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
-        'logo' => UploadedFile::fake()->image('logo.png'),
-        'employer' => 'Tech Corp',
-        // missing 'category'
-    ]);
-
-    $response->assertStatus(422)
-        ->assertJson([
-            'message' => 'A company must belong to a category.'
-        ]);
-});
-
 test('registration fails if email is taken', function () {
     User::factory()->create([
         'email' => 'duplicate@example.com'
     ]);
+    Category::create(['name' => 'test']);
 
     Storage::fake('local');
 
@@ -90,6 +75,7 @@ test('registration fails if email is taken', function () {
         'password' => 'password123',
         'password_confirmation' => 'password123',
         'logo' => UploadedFile::fake()->image('logo.png'),
+        'category' => 'test',
         'employer' => null
     ]);
 

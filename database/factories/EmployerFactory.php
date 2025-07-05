@@ -21,13 +21,9 @@ class EmployerFactory extends Factory
 
     public function definition(): array
     {
-        //    for testing only:
-        Category::create([
-            'name' => fake()->unique()->name()
-        ]);
         return [
             'name' => fake()->name(),
-            'category_id' => Category::inRandomOrder()->first()->id,
+            'category_id' => 1,
             'user_id' => User::factory()
         ];
     }

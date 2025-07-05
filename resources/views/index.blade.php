@@ -1,6 +1,14 @@
+@php use Illuminate\Support\Facades\Auth; @endphp
+
 <x-layout>
     <div class="space-y-10">
-        <h1 class="font-bold text-4xl text-center">Let's Find Your Next Job</h1>
+        <h1 class="font-bold text-3xl/10 text-center he">
+            @if(!Auth::user())
+                Welcome, Let's Find Your Next Job
+            @else
+                Welcome <?= Auth::user()->name ?>, Let's Find Your Next Job
+            @endif
+        </h1>
 
         <section class="pt-3">
             <x-section-heading>Top Jobs</x-section-heading>
@@ -14,7 +22,7 @@
                     @endforeach
                 @endif
             </div>
-{{--            to be implemented for all the top jobs--}}
+            {{--            to be implemented for all the top jobs--}}
             <a href="/jobs/top" class="text-gray-400 hover:text-white flex justify-end">See more</a>
 
         </section>
@@ -41,7 +49,7 @@
                     @endforeach
                 @endif
             </div>
-{{--            to be implemented for all the other jobs--}}
+            {{--            to be implemented for all the other jobs--}}
             <a href="/jobs/more" class="text-gray-400 hover:text-white flex justify-end">See more</a>
         </section>
     </div>

@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -14,8 +13,6 @@ test('superadmin can promote user to admin', function () {
         ->patchJson("/api/admins/create/$user->id", [
             'role' => 'admin'
         ]);
-
-//    dd($response);
 
     $response
         ->assertStatus(200)

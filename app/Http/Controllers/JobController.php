@@ -93,23 +93,30 @@ class JobController extends Controller
     }
 
     public function top(Request $request) {
-        $query = $request->input('q');
-        $jobsQuery = Job::where('top', true);
+        $result = $this->displayJobsQuery($request, true);
 
-        if($query) {
-            $this->searchQuery($jobsQuery, $query);
-        }else {
-            $jobsQuery->latest();
-        }
-
-        $jobs = $jobsQuery->simplePaginate(12);
-
-        return view('jobs.top', compact('jobs', 'query'));
+        return view('jobs.top', [
+            'jobs' => $result['jobs'],
+            'query' => $result['query'] ?? null
+        ]);
     }
 
     public function more(Request $request) {
+        $result = $this->displayJobsQuery($request, false);
+
+        return view('jobs.more', [
+            'jobs' => $result['jobs'],
+            'query' => $result['query'] ?? null
+        ]);
+    }
+
+    public function displayJobsQuery(Request $request, $top) {
         $query = $request->input('q');
-        $jobsQuery = Job::where('top', false);
+        $jobsQuery = Job::query();
+        if(Auth::user()) {
+            $jobsQuery->where('category_id', Auth::user()->category_id);
+        }
+        $jobsQuery->where('top', $top);
 
         if($query) {
             $this->searchQuery($jobsQuery, $query);
@@ -117,9 +124,10 @@ class JobController extends Controller
             $jobsQuery->latest();
         }
 
-        $jobs = $jobsQuery->simplePaginate(12);
-
-        return view('jobs.more', compact('jobs', 'query'));
+        return [
+            'jobs' => $jobsQuery->simplePaginate(12),
+            'query' => $query
+        ];
     }
 
     public function searchQuery($jobsQuery, $query) {

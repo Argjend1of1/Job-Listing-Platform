@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -17,6 +18,7 @@ class SuperAdminSeeder extends Seeder
 
         User::create([
             'name' => env('SUPERADMIN_NAME'),
+            'category_id' => 1,
             'email' => env('SUPERADMIN_EMAIL'),
             'password' => Hash::make(env('SUPERADMIN_PASSWORD')),
             'role' => 'superadmin',

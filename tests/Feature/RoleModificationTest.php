@@ -86,8 +86,9 @@ test('other roles receive a 403 when trying to delete an employer', function () 
     $response->assertStatus(403);
 });
 
-function createUser($role){
+function createUser($role, $id = 1){
     return User::factory()->create([
-        'role' => $role
+        'role' => $role,
+        'category_id' => $id
     ]);
 }

@@ -7,12 +7,13 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Expr\Cast\String_;
 
 class RegisterController extends Controller
 {
     public function create()
     {
-        return view('auth.register');
+        return view('auth.register', ["categories" => Category::all()]);
     }
     public function store(RegisterRequest $request)
     {
@@ -20,9 +21,11 @@ class RegisterController extends Controller
             $userAttributes = $request->validated();
 
             $logoPath = $request->file('logo')->store('logos'); // Store the file
+            $category = Category::where('name', $userAttributes['category'])->first();
 
             $userTableAttributes = [
                 'name' => $userAttributes['name'],
+                'category_id' => $category->id,
                 'email' => $userAttributes['email'],
                 'password' => bcrypt($userAttributes['password']),
                 'logo' => $logoPath
@@ -30,13 +33,6 @@ class RegisterController extends Controller
 
             // Check if the 'employer' field is provided
             if ($userAttributes['employer'] !== null) {
-                if (empty($userAttributes['category'])) {
-                    return response()->json([
-                        'message' => 'A company must belong to a category.'
-                    ], 422);
-                }
-
-                $category = Category::where('name', $userAttributes['category'])->first();
                 $userTableAttributes['role'] = 'employer';
 
                 $user = User::create($userTableAttributes);
