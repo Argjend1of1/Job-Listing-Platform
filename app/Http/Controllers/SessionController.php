@@ -28,7 +28,7 @@ class SessionController extends Controller
 
         if (!Auth::attempt($credentials)) {
             return back()->withErrors([
-                'error' => 'The provided credentials are incorrect.'
+                'password' => 'The provided credentials are incorrect.'
             ]);
         }
 
@@ -36,6 +36,7 @@ class SessionController extends Controller
         if ($request->hasSession()) {
             $request->session()->regenerate();
         }
+
 //        precaution
         if (!Auth::user()) {
             return back()->withErrors([

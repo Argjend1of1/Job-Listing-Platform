@@ -51,6 +51,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
 //authenticated with selected roles
 Route::middleware(['auth', 'role:user,employer,superemployer,admin'])->group(function () {
+    //!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
     Route::get('/account', [AccountController::class, 'index']);
     Route::get('/account/edit', [AccountController::class, 'edit']);
     Route::patch('/account/edit', [AccountController::class, 'update']);

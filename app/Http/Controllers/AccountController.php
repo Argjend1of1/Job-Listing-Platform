@@ -2,89 +2,103 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Inertia\Response;
+use Inertia\ResponseFactory;
 
+//InertiaComplete!!
 class AccountController extends Controller
 {
-    public function index()
+    public function index() : ResponseFactory | Response
     {
-        return inertia('account/Index');
-    }
-
-    public function show()
-    {
-        $user = Auth::user();
-        $employer = $user->employer;
-
-        return response()->json([
-            'user' => $user,
-            'employer' => $employer
+        return inertia('account/Index', [
+            'user' => $this->getUser(),
         ]);
     }
 
-    public function edit()
+    public function edit() : ResponseFactory | Response
     {
         return inertia('account/Edit', [
-            'employer' => Auth::user()->employer
+            'user' => $this->getUser(),
         ]);
     }
 
     public function update(Request $request)
     {
-        $user = Auth::user();
+        $user = $this->getUser();
 
-        $rules = [
-            'name' => 'required|string|max:255',
-        ];
-
+        $rules = ['name' => 'required|string|max:255'];
         if ($user->employer) {
             $rules['employer'] = 'required|string|max:100';
         }
 
         $validated = $request->validate($rules);
 
-        // Update employer name if applicable
-        if ($user->employer) {
-            $user->employer->update([
-                'name' => $validated['employer'],
+        try {
+            DB::transaction(function () use ($user, $validated) {
+                if ($user->employer) {
+                    $user->employer->update([
+                        'name' => $validated['employer']
+                    ]);
+                }
+
+                $user->update(['name' => $validated['name']]);
+            });
+
+            return back()->with(
+                'message', 'Account updated successfully!'
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Account update failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
             ]);
 
-            //no need to update the jobs related to the employer.
-            //because we use a foreignId, when we access the job employer,
-            //(e.g., $job->employer->name) it will return the updated value.
+            return back()->with(
+                'error', 'Update failed. Please try again.'
+            );
         }
-
-        // Update user info
-        $user->update([
-            'name' => $validated['name'],
-        ]);
-
-        // Optional: Dispatch email confirmation via queue
-        // SendAccountUpdatedEmail::dispatch($user); or use Mail::to($user)->queue(...)
-
-        return redirect('/account')->with(
-            'message', 'Account updated successfully!'
-        );
     }
-
 
     public function destroy()
     {
-        $user = Auth::user();
+        $user = $this->getUser();
 
-        // Delete related employer if it exists
-        if ($user->employer) {
-            $user->employer->delete();
+        try {
+            DB::transaction(function () use ($user) {
+                if ($user->employer) {
+                    $user->employer->delete();
+                }
+
+                $user->delete();
+            });
+            Auth::logout();
+
+            return back()->with(
+                'message', 'Account deleted successfully.'
+            );
+
+        }catch (\Exception $e) {
+            Log::error('Account deletion failed', [
+                'user' => $user,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with(
+                'error', 'Removing your account failed. Please try again!'
+            );
         }
+    }
 
-        // Delete the user
-        $user->delete();
-
-        // Log out user to avoid auth issues after deletion
-        Auth::logout();
-
-        return redirect('/')
-            ->with('message', 'Account deleted successfully.');
+    private function getUser(): User
+    {
+        /** @var User $user */
+        return User::with('employer')
+                    ->findOrFail(Auth::id());
     }
 }

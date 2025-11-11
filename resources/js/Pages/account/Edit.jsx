@@ -1,19 +1,22 @@
-import {useForm, usePage} from "@inertiajs/react";
+import {router, useForm} from "@inertiajs/react";
 import Input from "@/Pages/components/forms/Input.jsx";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import PageHeading from "@/Pages/components/body/PageHeading.jsx";
 import Button from "@/Pages/components/forms/Button.jsx";
 import {confirmAction} from "@/reusableFunctions/confirmAction.js";
+import {showError, showSuccess} from "@/reusableFunctions/alertUser.js";
+import Error from "@/Pages/components/body/Error.jsx";
 
-const Edit = ({employer}) => {
-    const {auth} = usePage().props;
-    const {role} = auth.user;
+const Edit = ({ user }) => {
+    const {employer, role} = user;
+
     const {data, setData, errors, processing, patch, delete:destroy} = useForm({
-        name: auth.user.name,
-        company: employer ? employer.name : ''
+        name: user.name,
+        employer: employer ? employer.name : '',
     });
 
     const inputRef = useRef(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         inputRef.current?.focus()
@@ -21,25 +24,47 @@ const Edit = ({employer}) => {
 
     const handleEditAccount = async (e) => {
         e.preventDefault();
-        const confirmed = await confirmAction({
-            text: "Are you sure you want to update your account ?",
-            confirmButtonText: 'Yes, I am sure!'
-        })
+        const confirmed = await confirmAction(
+            "Are you sure you want to update your account ?",
+            'Yes, I am sure!',
+        )
         if(confirmed) {
-            patch('/account/edit');
+            patch('/account/edit', {
+                onSuccess: (page) => {
+                    const {flash} = page.props;
+                    showSuccess(flash.message, 2000);
+                    router.get('/account');
+                },
+                onError: (page) => {
+                    const {error} = page
+                    showError(error);
+                }
+            });
         }
     }
 
     const handleDeleteAccount = async (e) => {
         e.preventDefault();
 
-        const confirmed = await ConfirmAction({
-            text: "Are you sure you want to remove your account ?",
-            confirmButtonText: 'Yes, I am sure!'
-        })
+        const confirmed = await confirmAction(
+            "Are you sure you want to remove your account ?",
+            'Yes, I am sure!',
+        )
 
         if(confirmed) {
-            destroy('/account/edit')
+            setIsDeleting(true);
+            destroy('/account/edit', {
+                onSuccess: (page) => {
+                    const {flash} = page.props
+                    showSuccess(flash.message, 2000)
+                    setIsDeleting(false);
+                },
+                onError: (page) => {
+                    const {flash} = page.props
+                    showError(flash.error, 2000)
+                    setIsDeleting(false)
+                }
+            })
         }
     }
 
@@ -57,13 +82,20 @@ const Edit = ({employer}) => {
                     value={data.name}
                     onChange={(e) => setData('name', e.target.value)}
                 />
+                {errors.name && (
+                    <Error error={errors.name} />
+                )}
+
                 {(role === 'employer' || role === 'superemployer') && (
                     <Input
                         name={"employer"}
                         label={"Company Name"}
-                        value={data.company}
-                        onChange={(e) => setData('company', e.target.value)}
+                        value={data.employer}
+                        onChange={(e) => setData('employer', e.target.value)}
                     />
+                )}
+                {errors.employer && (
+                    <Error error={errors.employer} />
                 )}
 
                 <Button
@@ -77,10 +109,10 @@ const Edit = ({employer}) => {
                 <Button
                     type={'button'}
                     onClick={handleDeleteAccount}
-                    disabled={processing}
+                    disabled={isDeleting}
                     className={'border-2 border-red-800 transition rounded-full py-2 px-6 font-bold ml-3 hover:bg-red-800 cursor-pointer focus:bg-red-900'}
                 >
-                    {processing ? 'Deleting...' : 'Delete'}
+                    {isDeleting ? 'Deleting...' : 'Delete'}
                 </Button>
 
             </form>
