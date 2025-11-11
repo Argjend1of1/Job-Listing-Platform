@@ -11,5 +11,5 @@ export async function confirmAction(text, confirmButtonText) {
         confirmButtonText: confirmButtonText
     });
 
-    return result.isConfirmed;
+    return result.isConfirmed; // boolean
 }

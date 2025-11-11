@@ -1,6 +1,5 @@
 import {useForm} from "@inertiajs/react";
 import {useEffect, useRef, useState} from "react";
-import UserLogo from "@/Pages/auth/UserLogo.jsx";
 import DropdownRoute from "@/Pages/auth/DropdownRoute.jsx";
 
 const RoleBasedDisplay = ({auth}) => {
@@ -46,7 +45,15 @@ const RoleBasedDisplay = ({auth}) => {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <UserLogo user={user} setIsOpen={setIsOpen} />
+            <div>
+                <img src={user.logo}
+                     alt={user.name}
+                     className="rounded-full flex items-center justify-center"
+                     width="40"
+                     height="40"
+                />
+            </div>
+
             {isOpen && (
                 <div
                     className="absolute bg-black border-1 border-gray-800 right-0 mt-2 w-48 rounded-md shadow-lg z-50 transition-all duration-200 ease-out transform scale-95"
@@ -109,7 +116,7 @@ const RoleBasedDisplay = ({auth}) => {
                     {user.role === 'superadmin' && (
                         <>
                             <DropdownRoute href={"/admins"}>
-                                Account
+                                Admins
                             </DropdownRoute>
 
                             <DropdownRoute href={'/employers'}>

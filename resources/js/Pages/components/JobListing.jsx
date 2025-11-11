@@ -52,22 +52,20 @@ const JobListing = ({ endpoint, titleDefault }) => {
 
             {jobs.data.length > 0 ? (
                 <>
-                    <InfiniteScroll
-                        data='jobs'
-                        loading={() =>
-                            <div className='flex justify-end my-3'>
-                                <RotatingLines
-                                    visible={true}
-                                    height="40"
-                                    width="40"
-                                    color="grey"
-                                    strokeWidth="5"
-                                    animationDuration="0.75"
-                                    ariaLabel="rotating-lines-loading"
-                                    wrapperStyle={{}}
-                                    wrapperClass=""
-                                />
-                            </div>
+                    <InfiniteScroll data='jobs'
+                                    loading={() => <div className='flex justify-end my-3'>
+                                        <RotatingLines
+                                            visible={true}
+                                            height="40"
+                                            width="40"
+                                            color="grey"
+                                            strokeWidth="5"
+                                            animationDuration="0.75"
+                                            ariaLabel="rotating-lines-loading"
+                                            wrapperStyle={{}}
+                                            wrapperClass=""
+                                        />
+                                    </div>
                         } //used as a fallback when content is loading
                     >
                         <div className="grid gap-8 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 mt-6">
