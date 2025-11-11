@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::unguard();
 
+//        !!Commented out because we have no view only JSX through React!!
         View::composer('*', function($view) {
             $view->with('navbarCategories', Category::all());
         });

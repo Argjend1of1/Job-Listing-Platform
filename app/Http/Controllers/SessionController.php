@@ -20,16 +20,16 @@ class SessionController extends Controller
     }
     public function create()
     {
-        return view('auth.login');
+        return inertia('auth/Login');
     }
     public function store(LoginRequest $request)
     {
         $credentials = $request->validated();
 
         if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'The provided credentials are incorrect.'
-            ], 422);
+            return back()->withErrors([
+                'error' => 'The provided credentials are incorrect.'
+            ]);
         }
 
 //        to allow testing the user logging in.
@@ -38,15 +38,13 @@ class SessionController extends Controller
         }
 //        precaution
         if (!Auth::user()) {
-            return response()->json([
-                'message' => 'Authentication failed after login. Please try again.'
-            ], 500);
+            return back()->withErrors([
+                'error' => 'Authentication failed after login. Please try again.'
+            ]);
         }
 
-        return response()->json([
-            'message' => 'Logged in successfully!',
-            'user' => Auth::user()
-        ]);
+        return redirect('/')
+            ->with('success', "Logged In Successfully!");
     }
     public function destroy(Request $request)
     {
@@ -54,8 +52,7 @@ class SessionController extends Controller
 
         $request->session()->invalidate();
 
-        return response()->json([
-            'message' => 'Successfully logged out!'
-        ]);
+        return redirect('/')
+            ->with('message', 'Successfully logged out!');
     }
 }

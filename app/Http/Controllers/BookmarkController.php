@@ -3,31 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Models\Job;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+//Inertia COMPLETED
 class BookmarkController extends Controller
 {
     public function index()
     {
-        $jobs = Auth::user()->bookmarkedJobs()->get();
-
-        return view('bookmark.index', compact('jobs'));
+        return inertia('bookmarks/Index', [
+            'jobs' => $this->getUser()
+                           ->bookmarkedJobs()
+                           ->with(['employer.user', 'tags'])
+                           ->get()
+        ]);
     }
 
     public function store(Job $job)
     {
-        $user = Auth::user();
-        if(!$user) {
-            return response()->json([
-                'message' => 'You must be authenticated to bookmark a job!'
-            ], 401);
-        }
+        $user = $this->getUser();
 
-        if($user->bookmarkedJobs()->where('job_id', $job->id)->exists()) {
-            return response()->json([
-                'message' => 'You already bookmarked this job!'
-            ], 409);
+        if($user->bookmarkedJobs()->where('job_id', $job->id)->exists())
+        {
+            return back()->with(
+                'message', 'You already bookmarked this job!'
+            );
         }
 
 //      Insert into the saved_jobs table a row
@@ -35,30 +36,39 @@ class BookmarkController extends Controller
 //      job_id = $job->id.
         $user->bookmarkedJobs()->attach($job->id);
 
-        return response()->json([
-            'message' => 'Bookmarked!'
-        ]);
+        return back()->with('completed', 'Bookmarked Successfully!');
     }
 
     public function show(Job $job)
     {
-        return view('bookmark.show', compact('job'));
+        $job->load('employer');
+        return inertia('bookmarks/Show', compact('job'));
+//        return view('bookmark.show', compact('job'));
     }
 
     public function destroy(Job $job)
     {
-        $user = Auth::user();
+        $user = $this->getUser();
 
         if (!$user->bookmarkedJobs()->where('job_id', $job->id)->exists()) {
-            return response()->json([
-                'message' => 'This job is not bookmarked by you.'
-            ], 403);
+            return back()->with(
+                'message', 'This job is not bookmarked by you.'
+            );
         }
 
+//        RAW QUERY(ex.):
+//        DELETE FROM saved_jobs
+//        WHERE user_id = 1
+//        AND job_id = 5;
         $user->bookmarkedJobs()->detach($job->id);
 
-        return response()->json([
-            'message' => 'Job removed from bookmarks!'
-        ]);
+        return redirect('/bookmarks')->with(
+            'completed', 'Successfully removed job from bookmarks!'
+        );
+    }
+
+    private function getUser() {
+        /** @var User $user */
+        return User::findOrFail((int) Auth::id());
     }
 }

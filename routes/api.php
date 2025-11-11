@@ -4,7 +4,6 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\BookmarkController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployerController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PasswordResetController;
@@ -15,11 +14,6 @@ use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
-// all users so we can show a message to the user that he must be logged in
-// to apply, and have a resume uploaded
-Route::post('/jobs/{id}/apply', [ApplicationController::class, 'store']);
-Route::post('/jobs/{job}/bookmark', [BookmarkController::class, 'store']);
 
 Route::middleware(['guest:sanctum'])->group(function () {
     Route::post('/login', [SessionController::class, 'store']);
@@ -37,7 +31,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
-    Route::post('/resume', [ResumeController::class, 'store']);
     Route::delete('/jobs/{job}/bookmark', [BookmarkController::class, 'destroy']);
 });
 
@@ -48,16 +41,6 @@ Route::middleware([
     Route::get('/account/edit', [AccountController::class, 'show']);
     Route::patch('/account/edit', [AccountController::class, 'update']);
     Route::delete('/account/edit', [AccountController::class, 'destroy']);
-
-    Route::post('/jobs/{job}/report', [ReportController::class, 'store']);
-});
-
-Route::middleware(['auth:sanctum', 'role:employer,superemployer'])->group(function () {
-    Route::post('/jobs/create', [JobController::class, 'store']);
-
-    Route::get('/dashboard', [DashboardController::class, 'show']);
-    Route::patch('/dashboard/edit/{job}', [DashboardController::class, 'update']);
-    Route::delete('/dashboard/edit/{job}', [DashboardController::class, 'destroy']);
 });
 
 //authenticated admin,superadmin
@@ -65,8 +48,6 @@ Route::middleware(['auth:sanctum', 'role:admin,superadmin'])->group(function () 
     Route::patch('/employers/{id}', [EmployerController::class, 'update']);
     Route::delete('/employers/{id}', [EmployerController::class, 'destroy']);
     Route::patch('/premiumEmployers/{id}', [PremiumEmployerController::class, 'update']);
-
-    Route::delete('/jobs/{job}/destroy', [JobController::class, 'destroy']);
 });
 
 //authenticated superadmin

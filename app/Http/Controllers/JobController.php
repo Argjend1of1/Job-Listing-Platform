@@ -5,48 +5,54 @@ namespace App\Http\Controllers;
 use App\Http\Requests\JobRequest;
 use App\Models\Job;
 use App\Models\Report;
+use App\Models\User;
 use App\Traits\JobFiltering;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Inertia\Response;
+use Inertia\ResponseFactory;
 
+//INERTIA COMPLETED
 class JobController extends Controller
 {
     use JobFiltering;
+
     public function index(Request $request)
     {
-        $query = $request->input('q');
+        [
+            'jobsQuery' => $jobsQuery,
+            'query' => $q
+        ] = $this->displayJobsQuery($request);
 
-//        query => starts a query builder chain
-        $jobsQuery = Job::query();
+        $jobs = $jobsQuery->latest();
 
-        if ($query) {
-            $this->searchQuery($jobsQuery, $query);
-
-        } else {
-            $jobsQuery->latest(); // Sort by created_at DESC
-        }
-        $jobs = $jobsQuery->simplePaginate(12);
-
-        return view('jobs.index', compact('jobs', 'query'));
+        return Inertia::render('jobs/Index', [
+            'jobs' => Inertia::scroll(fn () => $jobs->paginate(12)),
+            'query' => $q,
+        ]);
     }
 
-    public function create()
+    public function create() : ResponseFactory|Response
     {
-        return view('jobs.create');
+        return inertia('jobs/Store');
     }
 
-    public function store(JobRequest $request)
+    public function store(JobRequest $request) : RedirectResponse
     {
         $attributes = $request->validated();
+        $user = $this->getUser();
 
-        $attributes['category_id'] = Auth::user()->employer->category_id;
+        $attributes['category_id'] = $user->employer->category_id;
 
-        if(Auth::user()->role === 'superemployer') {
+        if($user->role === 'superemployer') {
             $attributes['top'] = true;
         }
 
-        $job = Auth::user()->employer->job()->create(
+        $job = $user->employer->job()->create(
             Arr::except($attributes, 'tags')
         );
 
@@ -56,94 +62,106 @@ class JobController extends Controller
             }
         }
 
-//        prevent lazy loading (n + 1 problem)
-        $job->load('employer');
-        $job->load('tags');
+        return redirect('/dashboard')
+            ->with('success', "Job Listed Successfully!");
+    }
 
-        return response()->json([
-            'message' => "Job Listed Successfully!",
-            'jobs' => $job
+    public function show(Job $job) : ResponseFactory|Response
+    {
+        $job->load('employer');
+
+        return inertia('jobs/Show', compact('job'));
+    }
+
+    public function destroy(Job $job) : RedirectResponse
+    {
+        try {
+            $reported = Report::where('job_id', $job->id)->first();
+            if ($reported !== null) $reported->delete();
+
+            $job->delete();
+
+            return redirect('/jobs')->with(
+                'completed', 'Job deleted successfully!'
+            );
+        }catch (\Exception $e) {
+            Log::error('Could not remove job with the id: ' . $job->id);
+
+            return redirect('/jobs')->with(
+                'error', 'An unexpected error occurred while removing this job. Please try again later.'
+            );
+        }
+    }
+
+    public function top(Request $request) : ResponseFactory|Response
+    {
+        [
+            'jobsQuery' => $jobsQuery,
+            'query' => $q
+        ] = $this->displayJobsQuery($request);
+
+        $jobs = $jobsQuery->where('top', true);
+
+        return Inertia::render('jobs/Top', [
+            'jobs' => Inertia::scroll(fn () => $jobs->paginate(12)),
+            'query' => $q
         ]);
     }
 
-    public function show(Job $job) {
-        return view('jobs.show', compact('job'));
+    public function more(Request $request) : ResponseFactory|Response
+    {
+        [
+            'jobsQuery' => $jobsQuery,
+            'query' => $q
+        ] = $this->displayJobsQuery($request);
+
+        $jobs = $jobsQuery->where('top', false);
+
+        return Inertia::render('jobs/More', [
+            'jobs' => Inertia::scroll(fn () => $jobs->paginate(12)),
+            'query' => $q
+        ]);
     }
 
-    public function destroy(Job $job)
+    public function displayJobsQuery(Request $request) : array
     {
+        /** @var User $user */
         $user = Auth::user();
 
-        if (!in_array($user->role, ['admin', 'superadmin'])) {
-            return response()->json([
-                'message' => 'Unauthorized.'
-            ], 403);
-        }
-
-//        in case a report for this job was made, also remove it.
-        $reported = Report::where('job_id', $job->id)->first();
-
-        if($reported !== null) {
-            $reported->delete();
-        }
-
-        $job->delete();
-
-        return response()->json([
-            'message' => 'Job deleted successfully!'
-        ]);
-    }
-
-    public function top(Request $request) {
-        $result = $this->displayJobsQuery($request, true);
-
-        return view('jobs.top', [
-            'jobs' => $result['jobs'],
-            'query' => $result['query'] ?? null
-        ]);
-    }
-
-    public function more(Request $request) {
-        $result = $this->displayJobsQuery($request, false);
-
-        return view('jobs.more', [
-            'jobs' => $result['jobs'],
-            'query' => $result['query'] ?? null
-        ]);
-    }
-
-    public function displayJobsQuery(Request $request, $top) {
-        $query = $request->input('q');
+        $q = $request->input('q');
         $jobsQuery = Job::query();
-        if(Auth::user()) {
+
+        if($user) {
             $excludedIds = $this->removeFromDisplay();
             $jobsQuery
-                ->where('category_id', Auth::user()->category_id)
+                ->where('category_id', $user->category_id)
                 ->whereNotIn('id', $excludedIds);
         }
-        $jobsQuery->where('top', $top);
 
-        if($query) {
-            $this->searchQuery($jobsQuery, $query);
-        }else {
-            $jobsQuery->latest();
-        }
+        if($q) $this->searchQuery($jobsQuery, $q);
 
         return [
-            'jobs' => $jobsQuery->simplePaginate(12),
-            'query' => $query
+            'jobsQuery' => $jobsQuery->with(['employer.user', 'tags']),
+            'query' => $q
         ];
     }
 
-    public function searchQuery($jobsQuery, $query) {
+    public function searchQuery($jobsQuery, $query)
+    {
         return $jobsQuery->where(function ($q) use ($query) {
             $q->where('title', 'like', "%$query%")
-                ->orWhere('company', 'like', "%$query%")
                 ->orWhere('location', 'like', "%$query%")
                 ->orWhere('schedule', 'like', "%$query%")
-                ->orWhere('about', 'like', "%$query%");
-        })->orWhereHas('employer', function ($q) use ($query) {
-            $q->where('name', 'like', "%$query%");
+                ->orWhere('about', 'like', "%$query%")
+                ->orWhereHas('employer', function ($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                });
         });
+    }
+
+    public function getUser() : User
+    {
+        return User::with('employer')
+                    ->findOrFail((int) Auth::id());
     }
 }

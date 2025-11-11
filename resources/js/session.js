@@ -22,7 +22,7 @@ if(!excludedPaths.includes(window.location.pathname)) {
                 }
             });
 
-            console.log(response);
+            // console.log(response);
 
             if (!response.ok) {
                 document.getElementById('guestLinks').classList.remove('hidden');

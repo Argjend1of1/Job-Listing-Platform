@@ -13,15 +13,22 @@ class RegisterController extends Controller
 {
     public function create()
     {
-        return view('auth.register', ["categories" => Category::all()]);
+//        return view('auth.register', ["categories" => Category::all()]);
+        $categories = Category::all();
+        return inertia(
+            'auth/Register', compact('categories')
+        );
     }
     public function store(RegisterRequest $request)
     {
         try {
             $userAttributes = $request->validated();
 
-            $logoPath = $request->file('logo')->store('logos'); // Store the file
-            $category = Category::where('name', $userAttributes['category'])->first();
+            $logoPath = $request->file('logo')
+                                ->store('logos', 'public');
+
+            $category = Category::where('name', $userAttributes['category'])
+                                ->first();
 
             $userTableAttributes = [
                 'name' => $userAttributes['name'],
@@ -42,18 +49,16 @@ class RegisterController extends Controller
                     'category_id' => $category->id,
                 ]);
             }else {
-                $user = User::create($userTableAttributes);
+                User::create($userTableAttributes);
             }
 
-            return response()->json([
-                'message' => 'Successfully Registered!',
-                'user' => $user,
-                'employer' => $user->employer ?? null
-            ]);
+            return redirect('/login')
+                ->with('success', 'Registered Successfully!');
+
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage() ?? 'User already exists!'
-            ], 409);
+            return back()->withErrors(
+                'error', $e->getMessage() ?? 'User already exists!'
+            );
         }
     }
 }

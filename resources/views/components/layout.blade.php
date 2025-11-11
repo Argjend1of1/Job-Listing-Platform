@@ -1,5 +1,5 @@
 @php use Illuminate\Support\Facades\Vite; @endphp
-    <!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap"
         rel="stylesheet">
-    @vite(['resources/js/app.js', 'resources/css/app.css'])
+    @vite(['resources/js/app.jsx', 'resources/css/app.css'])
 </head>
 <body class="bg-black text-white mb-25 font-hanken-grotesk">
 <div class="px-10">

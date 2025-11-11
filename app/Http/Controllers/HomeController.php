@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Job;
 use App\Models\Tag;
+use App\Models\User;
 use App\Traits\JobFiltering;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
@@ -12,34 +14,46 @@ class HomeController extends Controller
     use JobFiltering;
     public function __invoke()
     {
-        //display jobs based on the logged user's selected category,
         $queryTop = Job::query();
         $queryOther = Job::query();
-        if(Auth::user()) {
-            $excludedIds = $this->removeFromDisplay();
-            $queryTop
-                ->where('category_id', Auth::user()->category_id)
-                ->whereNotIn('id', $excludedIds);
 
-            $queryOther
-                ->where('category_id', Auth::user()->category_id)
-                ->whereNotIn('id', $excludedIds);
+        if(Auth::check()) {
+            /** @var User $user */
+            $user = Auth::user();
+        }else {
+            $user = null; //dealing with non authenticated user
         }
 
-        $topJobs = $queryTop->where('top', true)
-            ->latest()
-            ->take(6)
-            ->get();
+        $topJobs = $this->queryBuilder(
+            $queryTop, $user, true, 6
+        );
 
-        $otherJobs = $queryOther->where('top', false)
-            ->latest()
-            ->take(9)
-            ->get();
+        $otherJobs = $this->queryBuilder(
+            $queryOther, $user, false, 9
+        );
 
-        return view('index', [
+        return inertia('Index', [
             'topJobs' => $topJobs ?? null,
             'otherJobs' => $otherJobs ?? null,
             'tags' => Tag::latest()->simplePaginate(6)
         ]);
+    }
+
+    public function queryBuilder($query, ?User $user, bool $top, int $amount)
+    {
+        if($user) {
+            $excludedIds = $this->removeFromDisplay();
+
+            $query
+                ->where('category_id', $user->category_id)
+                ->whereNotIn('id', $excludedIds);
+        }
+
+        return $query
+            ->where('top', $top)
+            ->latest()
+            ->with(['employer.user', 'tags'])
+            ->take($amount)
+            ->get();
     }
 }

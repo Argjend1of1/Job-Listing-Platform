@@ -2,7 +2,7 @@
 
 <x-layout>
     <div class="space-y-10">
-        <h1 class="font-bold text-3xl/10 text-center he">
+        <h1 class="font-bold text-3xl/10 text-center">
             @if(!Auth::user())
                 Welcome, Let's Find Your Next Job
             @else

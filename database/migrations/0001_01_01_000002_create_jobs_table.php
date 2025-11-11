@@ -22,10 +22,12 @@ return new class extends Migration
             $table->text('about');
             $table->boolean('top')->default(false);
             $table->string('location');
-            $table->string('schedule')->default('Full Time');
+            $table->enum('schedule', ['Full Time', 'Part Time'])->default('Full Time');
             $table->string('url');
             $table->timestamps();
         });
+
+        //add expiring date? - stop listing the job after it expires.
     }
 
     /**

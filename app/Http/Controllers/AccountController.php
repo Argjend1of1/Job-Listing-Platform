@@ -9,7 +9,7 @@ class AccountController extends Controller
 {
     public function index()
     {
-        return view('account.index');
+        return inertia('account/Index');
     }
 
     public function show()
@@ -25,50 +25,66 @@ class AccountController extends Controller
 
     public function edit()
     {
-        return view('account.edit');
+        return inertia('account/Edit', [
+            'employer' => Auth::user()->employer
+        ]);
     }
 
     public function update(Request $request)
     {
         $user = Auth::user();
 
-        if($user->employer) {
-            $request->validate([
-                'name'       => 'required|string|max:255',
-                'employer'   => 'required|string|max:100', // if salary is in string format like "$50,000 USD"
-            ]);
+        $rules = [
+            'name' => 'required|string|max:255',
+        ];
 
-            $user->employer->update([
-                'name' => $request->employer
-            ]);
-        }else {
-            $request->validate([
-                'name'       => 'required|string|max:255',
-            ]);
+        if ($user->employer) {
+            $rules['employer'] = 'required|string|max:100';
         }
 
+        $validated = $request->validate($rules);
+
+        // Update employer name if applicable
+        if ($user->employer) {
+            $user->employer->update([
+                'name' => $validated['employer'],
+            ]);
+
+            //no need to update the jobs related to the employer.
+            //because we use a foreignId, when we access the job employer,
+            //(e.g., $job->employer->name) it will return the updated value.
+        }
+
+        // Update user info
         $user->update([
-            'name' => $request->name,
+            'name' => $validated['name'],
         ]);
 
-//      send an email to the user through queues
+        // Optional: Dispatch email confirmation via queue
+        // SendAccountUpdatedEmail::dispatch($user); or use Mail::to($user)->queue(...)
 
-        return response()->json([
-            'message' => 'Account updated successfully.',
-            'job'     => $user->fresh()->load('employer'),
-        ], 200);
+        return redirect('/account')->with(
+            'message', 'Account updated successfully!'
+        );
     }
 
 
     public function destroy()
     {
-        Auth::user()->delete();
+        $user = Auth::user();
 
-//        for users with no company relation:
-        if(Auth::user()->employer) Auth::user()->employer->delete();
+        // Delete related employer if it exists
+        if ($user->employer) {
+            $user->employer->delete();
+        }
 
-        return response()->json([
-            'message' => 'Account deleted successfully.'
-        ]);
+        // Delete the user
+        $user->delete();
+
+        // Log out user to avoid auth issues after deletion
+        Auth::logout();
+
+        return redirect('/')
+            ->with('message', 'Account deleted successfully.');
     }
 }

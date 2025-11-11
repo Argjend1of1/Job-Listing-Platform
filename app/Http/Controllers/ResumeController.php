@@ -7,15 +7,17 @@ use App\Models\Resume;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+//INERTIA COMPLETED
 class ResumeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index() {
-        return view('resume.index');
+        return inertia('resume/Index');
     }
 
     public function store(Request $request)
@@ -24,37 +26,54 @@ class ResumeController extends Controller
             'resume' => 'required|mimes:pdf,doc,docx|max:4096'
         ]);
 
-//        Store privately in storage/app/resumes
-        $path = $request->file('resume')->store('resumes', 'local');
+        /** @var User $user */
         $user = Auth::user();
 
-//        Delete old resume if it exists
-        if($user->resume) {
-//            locally
-            Storage::disk('local')->delete($user->resume->file_path);
+//        Store privately in storage/app/resumes
+        $path = $request->file('resume')
+                        ->store('resumes', 'local');
 
-//            database:
-            $user->resume->delete();
+        try {
+//            Delete old resume if it exists
+            if($user->resume) {
+//              locally:
+                Storage::disk('local')
+                        ->delete($user->resume->file_path);
+
+//              database:
+                $user->resume->delete();
+            }
+
+            Resume::create([
+                'user_id' => Auth::id(),
+                'file_path' => $path,
+            ]);
+
+            return redirect('/jobs')->with(
+                'completed', 'Resume Uploaded Successfully. Apply for your next job!'
+            );
+
+        }catch (\Exception $e) {
+            Log::error('Resume upload failed!', [
+                'user_id' => $user->id,
+                'resume'  => $request->file('resume'),
+                'error'   => $e->getMessage(),
+            ]);
+
+            return back()->with(
+                'error', 'An unexpected error occurred. Please try again later.'
+            );
         }
 
-        Resume::create([
-            'user_id' => Auth::user()->id,
-            'file_path' => $path,
-        ]);
-
-        return response()->json([
-            'message' => 'Resume Uploaded Successfully!'
-        ]);
     }
 
     /**
      * Display the specified resource.
      */
     public function show(User $user, Job $job) {
-        $authUser = Auth::user();
+        $authUser = $this->getUser();
 
-        // Make sure user is authenticated and is an employer
-        if (!$authUser || !$authUser->employer) {
+        if (!$authUser->employer) {
             abort(403, 'Unauthorized: Not an employer.');
         }
 
@@ -67,11 +86,22 @@ class ResumeController extends Controller
             abort(403, 'You do not own this job.');
         }
 
-        if (!$user->resume->file_path || !Storage::disk('local')->exists($user->resume->file_path)) {
-            abort(404, 'Resume not found.');
+        if (!$user->resume ||
+            !$user->resume->file_path ||
+            !Storage::disk('local')->exists($user->resume->file_path)
+        ) {
+            return back()->with(
+                'error', 'An internal problem occurred. Please try again later.'
+            );
         }
 
         return Storage::disk('local')->download($user->resume->file_path);
+    }
+
+    public function getUser() : User
+    {
+        return User::with('employer')
+                    ->findOrFail((int) Auth::id());
     }
 
 }

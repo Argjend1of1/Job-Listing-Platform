@@ -10,7 +10,7 @@
 
             <div>
                 <p class="text-lg text-white font-semibold">Company:</p>
-                <a href="/companies/{{$job->employer->id}}/jobs"
+                    <a href="/companies/{{$job->employer->id}}/jobs"
                    class="text-gray-400 text-base hover:underline"
                 >
                     {{$job->employer->name}}

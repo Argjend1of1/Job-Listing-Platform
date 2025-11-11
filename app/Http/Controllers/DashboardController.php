@@ -2,44 +2,46 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\InertiaProps\UserLogo;
 use App\Models\Job;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+
+
+//Inertia COMPLETED
 class DashboardController extends Controller
 {
     public function index()
     {
-        return view('dashboard.index');
-    }
-    public function show()
-    {
-        $user = Auth::user();
+        /** @var User $user */
+        $user = User::with('employer.job.tags')
+                    ->findOrFail((int) Auth::id());
 
-        return response()->json([
+        return inertia('dashboard/Index', [
             'user' => $user,
-            'jobs' => $user->employer->job,
-//            just for testing
-            'message' => '(super)employer can access dashboard!'
+            'logo' => new UserLogo($user),
+            'jobs' => $user->employer->job
         ]);
     }
 
     public function edit(Job $job)
     {
         $job->load('employer');
+        Gate::authorize('manage', $job);
 
-        if(Auth::user()->id !== $job->employer->user_id) {
-            return redirect('/');
-        }
-
-        return view('dashboard.edit', [
-            'job' => $job,
+        return inertia('dashboard/Edit', [
+            'job' => $job
         ]);
     }
 
     public function update(Request $request, Job $job) {
+        Gate::authorize('manage', $job);
+
         $request->validate([
             'title'       => 'required|string|max:255',
-            'schedule'    => 'required|in:Full Time,Part Time', // customize as needed
+            'schedule'    => 'required|in:Full Time,Part Time',
             'about'       => 'required',
             'salary'      => 'required|string|max:100' // if salary is in string format like "$50,000 USD"
         ]);
@@ -47,30 +49,20 @@ class DashboardController extends Controller
         $job->update([
             'title' => $request->title,
             'schedule' => $request->schedule,
-            'salary' => $request->salary
+            'salary' => $request->salary,
+            'about' => $request->about
         ]);
 
-        return response()->json([
-            'message' => 'Job updated successfully!',
-            'job'     => $job->fresh()->load('tags','employer'),
-        ]);
-//      reloading a fresh model instance for the job with its relations
+        return redirect('/dashboard')
+                ->with('success', 'Listing updated successfully!');
     }
 
     public function destroy(Job $job) {
-        $user = Auth::user();
-
-//        if authenticated job must belong to you
-        if($user->employer->id !== $job->employer->id) {
-            return response()->json([
-                'message' => "Unauthorized to remove others' jobs!"
-            ], 403);
-        }
+        Gate::authorize('manage', $job);
 
         $job->delete();
 
-        return response()->json([
-            'message' => 'Listing deleted successfully!'
-        ]);
+        return redirect('/dashboard')
+                ->with('success', 'Listing deleted successfully!');
     }
 }
