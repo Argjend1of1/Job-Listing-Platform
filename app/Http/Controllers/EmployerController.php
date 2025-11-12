@@ -15,22 +15,13 @@ class EmployerController extends Controller
 {
     public function index(Request $request): RedirectResponse | Response
     {
-        $query = $request->input('q');
+        $searchQuery = $request->input('q');
 
-        $employers = Employer::whereHas('user', function ($q) use ($query) {
-            $q->where('role', 'employer');
-
-            if ($query) {
-                $q->where('name', 'like', "%{$query}%");
-//                others orWhere(...)
-            }
-        })
-        ->with('user')
-        ->latest();
+        $employers = Employer::withUserFilter(search: $searchQuery);
 
         return inertia('employer/Index', [
             'employers' => Inertia::scroll(fn () => $employers->paginate(12)),
-            'query' => $query ?? ''
+            'query' => $searchQuery ?? ''
         ]);
     }
 
@@ -48,7 +39,7 @@ class EmployerController extends Controller
             //it means we want to demote the employer
             try {
                 $employer->user->role = 'employer';
-                $employer->save();
+                $employer->user->save();
 
                 return back()->with(
                     'message', 'Employer Demoted Successfully!'

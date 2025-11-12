@@ -73,7 +73,7 @@ const EmployerCardWide = ({ employer }) => {
     }
 
     return (
-        <Panel className="gap-x-5 md:gap-x-3 items-center mt-5">
+        <Panel className="gap-x-5 md:gap-x-3 items-center mt-10">
             <div>
                 <img src={user.logo}
                      alt={employer.name}

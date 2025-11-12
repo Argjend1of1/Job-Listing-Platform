@@ -87,7 +87,6 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     Route::get('/employers', [EmployerController::class, 'index']);
     Route::patch('/employers/{id}', [EmployerController::class, 'update']);
     Route::delete('/employers/{id}', [EmployerController::class, 'destroy']);
-
     Route::get('/premiumEmployers', [PremiumEmployerController::class, 'index']);
 
     Route::get('/reports', [ReportController::class, 'index']);
