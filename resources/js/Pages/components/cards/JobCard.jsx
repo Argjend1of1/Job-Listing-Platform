@@ -35,7 +35,7 @@ const JobCard = ({job, route = `/jobs/${job.id}`}) => {
                     ))}
                 </div>
 
-                <EmployerLogo employer={job.employer?.user} width={42} />
+                {/*<EmployerLogo employer={job.employer?.user} width={42} />*/}
             </div>
         </Panel>
     )

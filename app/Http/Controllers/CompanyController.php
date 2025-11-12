@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employer;
+use App\Models\Job;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Inertia\Inertia;
 
 class CompanyController extends Controller
 {
     public function index(Request $request)
     {
         $query = $request->input('q');
-
-//        query() -> allows chaining queries
-        $employersQuery = Employer::query();
+        $employersQuery = Employer::with(['user', 'category']);
 
         if($query) {
             $employersQuery->where('name', 'like', "%$query%")
@@ -23,21 +24,23 @@ class CompanyController extends Controller
             $employersQuery->latest();
         }
 
-        $employers = $employersQuery->simplePaginate(12);
-
-        return view('company.index', [
-            'employers' => $employers
+        return inertia('company/Index', [
+            'employers' => Inertia::scroll(fn () => $employersQuery->paginate(12)),
+            'query' => $query ?? ''
         ]);
     }
 
     public function show($id)
     {
-        $employer = Employer::with('job')->findOrFail($id);
-        $jobs = $employer->job->all();
+        /** @var Employer $employer */
+        $employer = Employer::findOrFail($id);
 
-        return view('company.show', [
+        /** @var LengthAwarePaginator<int, Job> $jobs */
+        $jobs = $employer->job()->with('tags')->paginate(12);
+
+        return inertia('company/Show', [
             'employer' => $employer,
-            'jobs' => $jobs
+            'jobs' => Inertia::scroll(fn () => $jobs),
         ]);
     }
 }

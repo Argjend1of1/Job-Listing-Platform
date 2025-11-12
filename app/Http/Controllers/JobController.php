@@ -32,7 +32,7 @@ class JobController extends Controller
 
         return Inertia::render('jobs/Index', [
             'jobs' => Inertia::scroll(fn () => $jobs->paginate(12)),
-            'query' => $q,
+            'query' => $q ?? '',
         ]);
     }
 
@@ -104,7 +104,7 @@ class JobController extends Controller
 
         return Inertia::render('jobs/Top', [
             'jobs' => Inertia::scroll(fn () => $jobs->paginate(12)),
-            'query' => $q
+            'query' => $q ?? ''
         ]);
     }
 
@@ -119,7 +119,7 @@ class JobController extends Controller
 
         return Inertia::render('jobs/More', [
             'jobs' => Inertia::scroll(fn () => $jobs->paginate(12)),
-            'query' => $q
+            'query' => $q ?? ''
         ]);
     }
 

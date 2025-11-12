@@ -2,11 +2,9 @@ const JobCardWide = ({user, job, logo}) => {
     const tagsHtml = job.tags?.map(tag => (
         <span key={tag.id} className="bg-gray-700 text-white text-[10px] px-3 py-1 rounded-full">{tag.name}</span>
     ));
-console.log(user.logo)
 
     return (
-        <div
-            className="p-4 bg-white/10 rounded-xl mt-3 flex border border-transparent hover:border-blue-900 cursor-pointer group transition-colors duration-200">
+        <div className="p-4 bg-white/10 rounded-xl mt-3 flex border border-transparent hover:border-blue-900 cursor-pointer group transition-colors duration-200">
             <div>
                 <img src={logo}
                      alt={user.employer.name}
