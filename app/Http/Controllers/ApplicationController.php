@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
-//INERTIA COMPLETED
+//INERTIA COMPLETE
 class ApplicationController extends Controller
 {
     public function store($id)
@@ -21,7 +21,6 @@ class ApplicationController extends Controller
                 'message', 'Please upload your resume before applying!'
             );
         }
-
         $alreadyApplied = $user->applications()
                                ->where('job_id', $id)
                                ->exists();

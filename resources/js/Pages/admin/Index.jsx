@@ -46,7 +46,7 @@ const Index = () => {
                 </Form>
 
                 <InfiniteScroll data={'admins'}
-                                loading={() => <div>
+                                loading={() => <div className={'flex justify-end my-3'}>
                                     <RotatingLines
                                         visible={true}
                                         height="40"

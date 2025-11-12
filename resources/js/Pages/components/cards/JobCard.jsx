@@ -10,7 +10,7 @@ const JobCard = ({job, route = `/jobs/${job.id}`}) => {
                 href={`/companies/${job.employer?.id}/jobs`}
                 className={'self-start text-sm hover:underline'}
             >
-                {job.employer.name}
+                {job.employer?.name}
             </Link>
 
             <div className={'py-8'}>
@@ -35,7 +35,7 @@ const JobCard = ({job, route = `/jobs/${job.id}`}) => {
                     ))}
                 </div>
 
-                <EmployerLogo employer={job.employer.user} width={42} />
+                <EmployerLogo employer={job.employer?.user} width={42} />
             </div>
         </Panel>
     )
