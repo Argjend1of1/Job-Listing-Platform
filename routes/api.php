@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BookmarkController;
-use App\Http\Controllers\EmployerController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PremiumEmployerController;
 use App\Http\Controllers\RegisterController;
@@ -40,8 +39,6 @@ Route::middleware([
 
 //authenticated admin,superadmin
 Route::middleware(['auth:sanctum', 'role:admin,superadmin'])->group(function () {
-    Route::patch('/employers/{id}', [EmployerController::class, 'update']);
-    Route::delete('/employers/{id}', [EmployerController::class, 'destroy']);
     Route::patch('/premiumEmployers/{id}', [PremiumEmployerController::class, 'update']);
 });
 

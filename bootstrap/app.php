@@ -60,7 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // ✅ Handle Not Found (404)
             if ($status === 404) {
-                return redirect()->route('home')->with([
+                return redirect('/')->with([
                     'error' => 'The page you were looking for could not be found.',
                 ]);
             }

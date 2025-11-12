@@ -4,63 +4,119 @@ namespace App\Http\Controllers;
 
 use App\Models\Employer;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Inertia\Response;
+
 class EmployerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function index(Request $request): RedirectResponse | Response
     {
         $query = $request->input('q');
 
-//        closure - param ($query) from outside scope for search usage
-        $employers = Employer::whereHas('user', function ($userQuery) use ($query) {
-            $userQuery->where('role', 'employer');
+        $employers = Employer::whereHas('user', function ($q) use ($query) {
+            $q->where('role', 'employer');
 
             if ($query) {
-                $userQuery->where('name', 'like', "%{$query}%");
+                $q->where('name', 'like', "%{$query}%");
 //                others orWhere(...)
             }
         })
-            ->latest()
-            ->simplePaginate(10)
-            ->appends(['q' => $query]);
+        ->with('user')
+        ->latest();
 
-        return view('employer.index', [
-            'employers' => $employers,
-            'query' => $query
+        return inertia('employer/Index', [
+            'employers' => Inertia::scroll(fn () => $employers->paginate(12)),
+            'query' => $query ?? ''
         ]);
     }
-    public function update($id)
+
+    public function update($id): RedirectResponse | Response
     {
-        $employer = User::findOrFail($id);
-        if(!$employer) {
-            return response()->json([
-                'message' => 'Could not find company.'
-            ], 404);
+        $employer = $this->getEmployer($id);
+
+        if(!$employer)
+            return back()->with(
+                'message', 'Could not find company.'
+            );
+
+        if($employer->user->role === 'superemployer') {
+            //if the role superemployer and we hit this method,
+            //it means we want to demote the employer
+            try {
+                $employer->user->role = 'employer';
+                $employer->save();
+
+                return back()->with(
+                    'message', 'Employer Demoted Successfully!'
+                );
+            }catch (\Exception $e) {
+                Log::error('Employer demotion failed', [
+                    'user' => $employer->user,
+                    'employer' => $employer,
+                    'error' => $e->getMessage()
+                ]);
+                return back()->with(
+                    'error', 'Could not demote employer. Please try again!'
+                );
+            }
+
+        }else {
+            //else the role is employer, so the desire is promotion
+            try {
+                $employer->user->role = 'superemployer';
+                $employer->user->save();
+
+                return back()->with(
+                    'message', 'Employer Promoted Successfully!'
+                );
+
+            }catch (\Exception $e) {
+                Log::error('Employer promotion failed', [
+                    'user' => $employer->user,
+                    'employer' => $employer,
+                    'error' => $e->getMessage()
+                ]);
+                return back()->with(
+                    'error', 'Could not promote employer. Please try again!'
+                );
+            }
         }
-
-        $employer->role = 'superemployer';
-        $employer->save();
-
-        return response()->json([
-            'message' => 'Employer Promoted Successfully!'
-        ]);
     }
 
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse | Response
     {
         // You can now use $id to find and delete the employer
-        $employer = Employer::findOrFail($id);
-        $user = $employer->user;
+        $employer = $this->getEmployer($id);
 
-        $employer->job()->delete();
-        $user->delete();
-        $employer->delete();
+        try {
+            //precaution removal if cascadeOnDelete() does not work
+            $employer->job()->delete(); //all the jobs by employer
+            $employer->user->delete();  //his user data
+            $employer->delete();        //employer data
 
-        return response()->json([
-            'message' => 'Employer deleted successfully!'
-        ]);
+            return back()->with(
+                'message', 'Employer removed successfully!'
+            );
+
+        }catch (\Exception $e) {
+            Log::error('Removal of employer failed', [
+                'user' => $employer->user,
+                'employer' => $employer,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with(
+                'error', 'Could not remove employer. Please try again.'
+            );
+        }
+    }
+
+    private function getEmployer($id): Employer
+    {
+        return Employer::with('user')->findOrFail($id);
     }
 }
