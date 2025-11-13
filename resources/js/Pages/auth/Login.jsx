@@ -1,4 +1,4 @@
-import {useForm} from "@inertiajs/react";
+import {Link, useForm} from "@inertiajs/react";
 import PageHeading from "@/Pages/components/body/PageHeading.jsx";
 import Button from "@/Pages/components/forms/Button.jsx";
 import Input from "@/Pages/components/forms/Input.jsx";
@@ -67,7 +67,11 @@ const Login = () => {
                     )}
                 </div>
 
-
+                <div className="mt-4 text-sm">
+                    <Link href={"/forgot-password"} className="text-blue-500 hover:underline">
+                        Forgot your password?
+                    </Link>
+                </div>
 
                 <Button
                     type={"submit"}

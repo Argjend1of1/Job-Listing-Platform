@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Expr\Cast\String_;
 
+//INERTIA COMPLETE!!
 class RegisterController extends Controller
 {
     public function create()

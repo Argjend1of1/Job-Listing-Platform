@@ -9,6 +9,7 @@ use App\Traits\JobFiltering;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 
+//INERTIA COMPLETE!!
 class HomeController extends Controller
 {
     use JobFiltering;
@@ -21,7 +22,7 @@ class HomeController extends Controller
             /** @var User $user */
             $user = Auth::user();
         }else {
-            $user = null; //dealing with non authenticated user
+            $user = null;
         }
 
         $topJobs = $this->queryBuilder(
@@ -39,7 +40,7 @@ class HomeController extends Controller
         ]);
     }
 
-    public function queryBuilder($query, ?User $user, bool $top, int $amount)
+    private function queryBuilder($query, ?User $user, bool $top, int $amount)
     {
         if($user) {
             $excludedIds = $this->removeFromDisplay();

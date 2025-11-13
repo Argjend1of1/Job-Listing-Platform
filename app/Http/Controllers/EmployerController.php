@@ -108,6 +108,7 @@ class EmployerController extends Controller
 
     private function getEmployer($id): Employer
     {
-        return Employer::with('user')->findOrFail($id);
+        return Employer::with('user')
+                       ->findOrFail($id);
     }
 }

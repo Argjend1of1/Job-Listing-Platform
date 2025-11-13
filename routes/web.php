@@ -31,7 +31,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [RegisterController::class, 'store']);
 
     Route::get('/forgot-password', [PasswordResetController::class, 'index']);
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendEmail']);
+    Route::get('/forgot-password/index', [PasswordResetController::class, 'wait']);
+
     Route::get('/reset-password', [PasswordResetController::class, 'edit']);
+    Route::patch('/reset-password', [PasswordResetController::class, 'update']);
 });
 
 //auth with users role only

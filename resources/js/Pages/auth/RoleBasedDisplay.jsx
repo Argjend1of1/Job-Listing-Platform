@@ -17,24 +17,26 @@ const RoleBasedDisplay = ({auth}) => {
     // as long as the component is mounted.
 
     useEffect(() => {
-        const handleClick = (e) => {
-            if(!dropdownRef.current.contains(e.target)) {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
                 setIsOpen(false);
             }
-            if(dropdownButtonsRef.current?.contains(e.target)) {
+        };
+        const handleClickOnDropDown = (e) => {
+            if(dropdownButtonsRef.current && dropdownButtonsRef.current.contains(e.target)) {
                 timeoutRef.current = setTimeout(() => {
-                    setIsOpen(prevState => !prevState);
+                    setIsOpen(false)
                 }, 300)
             }
         }
-        document.addEventListener('mousedown', handleClick)
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handleClickOnDropDown);
 
         return () => {
-            document.removeEventListener('mousedown', handleClick)
-            if(timeoutRef.current) {
-                clearTimeout(timeoutRef.current)
-            }
-        }
+            document.removeEventListener('mousedown', handleClickOutside)
+            document.removeEventListener('mousedown', handleClickOnDropDown)
+            clearTimeout(timeoutRef.current)
+        };
 
     }, []);
 
@@ -45,7 +47,9 @@ const RoleBasedDisplay = ({auth}) => {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <div>
+            <div className={'cursor-pointer'}
+                 onClick={() => setIsOpen(prev => !prev)}
+            >
                 <img src={user.logo}
                      alt={user.name}
                      className="rounded-full flex items-center justify-center"

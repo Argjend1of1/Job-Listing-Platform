@@ -2,21 +2,10 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BookmarkController;
-use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PremiumEmployerController;
-use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
-Route::middleware(['guest:sanctum'])->group(function () {
-    Route::post('/login', [SessionController::class, 'store']);
-    Route::post('/register', [RegisterController::class, 'store']);
-
-    Route::post('/forgot-password', [PasswordResetController::class, 'show']);
-    Route::post('/reset-password', [PasswordResetController::class, 'update']);
-
-});
 
 //for routes that will be role protected, for example admin:
 Route::middleware(['auth:sanctum'])->group(function () {

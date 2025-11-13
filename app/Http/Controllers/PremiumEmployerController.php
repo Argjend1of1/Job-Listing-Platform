@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+
+//INERTIA COMPLETE!!
 class PremiumEmployerController extends Controller
 {
     /**
