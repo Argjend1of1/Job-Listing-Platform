@@ -10,12 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-//INERTIA COMPLETED
+//INERTIA COMPLETE!!
 class ResumeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index() {
         return inertia('resume/Index');
     }
@@ -60,9 +57,9 @@ class ResumeController extends Controller
                 'error'   => $e->getMessage(),
             ]);
 
-            return back()->with(
-                'error', 'An unexpected error occurred. Please try again later.'
-            );
+            return back()->withErrors([
+                'error' => 'An unexpected error occurred. Please try again later.'
+            ]);
         }
 
     }

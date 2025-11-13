@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 //guests
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [SessionController::class, 'create'])
+    Route::get('/login', [SessionController::class, 'index'])
         ->name('login');
 
     Route::post('/login', [SessionController::class, 'store']);
@@ -43,13 +43,11 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/resume', [ResumeController::class, 'index']);
     Route::post('/resume', [ResumeController::class, 'store']);
 
-    //!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
     Route::get('/jobs/{job}/bookmark', [BookmarkController::class, 'show']);
     Route::post('/jobs/{job}/bookmark', [BookmarkController::class, 'store']);
     Route::delete('/jobs/{job}/bookmark', [BookmarkController::class, 'destroy']);
 
-    //!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
     Route::post('/jobs/{id}/apply', [ApplicationController::class, 'store']);
 });
 

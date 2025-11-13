@@ -1,8 +1,6 @@
-import Form from "@/Pages/components/forms/Form.jsx";
 import Input from "@/Pages/components/forms/Input.jsx";
-import {router, useForm, usePage} from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import Button from "@/Pages/components/forms/Button.jsx";
-import {useState} from "react";
 import {showError} from "@/reusableFunctions/alertUser.js";
 
 const Index = () => {

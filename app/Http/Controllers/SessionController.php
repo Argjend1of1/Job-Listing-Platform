@@ -3,26 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Response;
 
+//INERTIA COMPLETE!!
 class SessionController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
-        $employer = Auth::user()->employer;
-
-        return response()->json([
-            'user' => $user,
-            'employer' => $employer,
-        ]);
-    }
-    public function create()
+    public function index() : Response
     {
         return inertia('auth/Login');
     }
-    public function store(LoginRequest $request)
+
+    public function store(LoginRequest $request) : RedirectResponse
     {
         $credentials = $request->validated();
 
@@ -47,7 +41,8 @@ class SessionController extends Controller
         return redirect('/')
             ->with('success', "Logged In Successfully!");
     }
-    public function destroy(Request $request)
+
+    public function destroy(Request $request) : RedirectResponse
     {
         Auth::guard('web')->logout(); // explicitly log out via the session-based guard
 

@@ -20,6 +20,7 @@ const ReportCard = ({ report }) => {
                 <p className="text-sm text-gray-300 font-medium">🏢 Published By:</p>
                 <Link href={`/companies/${employer.id}/jobs`} className="text-white font-semibold">
                     {employer.user.name}
+                    <br />
                     <span className="text-sm text-gray-400">({employer.user.email})</span>
                 </Link>
             </div>
@@ -30,11 +31,11 @@ const ReportCard = ({ report }) => {
                 <p className="text-sm text-gray-300 font-medium">🧑‍💼 Reported By:</p>
                 <p className="text-white font-semibold text-sm">
                     { user.employer
-                        ? `${user.name} of ${user.employer.name} company`
+                        ? `${user.name} of ${user.employer.name} Company`
                         : user.name
                     }
                     <br/>
-                    <span className="text-sm text-gray-400">Email: ({ user.email })</span>
+                    <span className="text-sm text-gray-400">({ user.email })</span>
                 </p>
             </div>
         </div>
