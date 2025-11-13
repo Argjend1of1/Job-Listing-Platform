@@ -65,79 +65,36 @@ const RoleBasedDisplay = ({auth}) => {
                 >
                     {user.role === 'user' && (
                         <>
-                            <DropdownRoute href={"/account"} >
-                                Account
-                            </DropdownRoute>
-
-                            <DropdownRoute href={'/resume'}>
-                                Upload Resume
-                            </DropdownRoute>
-
-                            <DropdownRoute href={"/bookmarks"}>
-                                Bookmarks
-                            </DropdownRoute>
+                            <DropdownRoute href={"/account"} label={'Account'} />
+                            <DropdownRoute href={"/resume"} label={'Upload Resume'} />
+                            <DropdownRoute href={"/bookmarks"} label={'Bookmarks'} />
                         </>
                     )}
 
                     {(user.role === 'employer' || user.role === 'superemployer') && (
                         <>
-                            <DropdownRoute href={"/account"} >
-                                Account
-                            </DropdownRoute>
-
-                            <DropdownRoute href={'/dashboard'} >
-                                Dashboard
-                            </DropdownRoute>
-
-                            <DropdownRoute href={"/jobs/create"}>
-                                Post a Job
-                            </DropdownRoute>
+                            <DropdownRoute href={"/account"} label={'Account'} />
+                            <DropdownRoute href={"/dashboard"} label={'Dashboard'} />
+                            <DropdownRoute href={"/jobs/create"} label={'Post a Job'} />
                         </>
                     )}
 
-
-
                     {user.role === 'admin' && (
                         <>
-                            <DropdownRoute href={"/account"} >
-                                Account
-                            </DropdownRoute>
-
-                            <DropdownRoute href={'/employers'} >
-                                Employers
-                            </DropdownRoute>
-
-                            <DropdownRoute href={"/premiumEmployers"}>
-                                Premium Employers
-                            </DropdownRoute>
-
-                            <DropdownRoute href={"/reports"}>
-                                Reported Jobs
-                            </DropdownRoute>
+                            <DropdownRoute href={"/account"} label={'Account'} />
+                            <DropdownRoute href={"/employers"} label={'Employers'} />
+                            <DropdownRoute href={"/premiumEmployers"} label={'Premium Employers'} />
+                            <DropdownRoute href={"/reports"} label={'Reported Jobs'} />
                         </>
                     )}
 
                     {user.role === 'superadmin' && (
                         <>
-                            <DropdownRoute href={"/admins"}>
-                                Admins
-                            </DropdownRoute>
-
-                            <DropdownRoute href={'/employers'}>
-                                Employers
-                            </DropdownRoute>
-
-                            <DropdownRoute href={"/premiumEmployers"}>
-                                Premium Employers
-                            </DropdownRoute>
-
-                            <DropdownRoute href={"/admins/create"}>
-                                Promote Users
-                            </DropdownRoute>
-
-                            <DropdownRoute href={"/reports"}>
-                                Reported Jobs
-                            </DropdownRoute>
+                            <DropdownRoute href={"/admins"} label={'Account'} />
+                            <DropdownRoute href={"/employers"} label={'Employers'} />
+                            <DropdownRoute href={"/premiumEmployers"} label={'Premium Employers'} />
+                            <DropdownRoute href={"/admins/create"} label={'Promote Users'} />
+                            <DropdownRoute href={"/reports"} label={'Reported Jobs'} />
                         </>
                     )}
 
