@@ -37,7 +37,7 @@ const Index = () => {
                 </Form>
             </section>
 
-            <InfiniteScrolling data={data}>
+            <InfiniteScrolling data={'admins'}>
                 {admins.data.length > 0 ? (
                     <div className="grid gap-8 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 mt-6">
                         {admins.data.map((admin) => (

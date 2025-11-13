@@ -3,51 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\UserService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request) : Response
     {
-        $query = $request->input('q');
-        $usersQuery = User::where('role', 'user');
-
-        if($query) {
-            $usersQuery->where('name', 'like', "%$query%");
-        }
-
-        $users = $usersQuery
-            ->latest()
-            ->simplePaginate(12)
-            ->appends(['q' => $query]);
-
-        return view('user.index',[
+        [
             'users' => $users,
             'query' => $query
+        ] = UserService::getUsersByRole($request, 'user');
+
+        return inertia('users/Index',[
+            'users' => Inertia::scroll(fn () => $users),
+            'query' => $query ?? '',
         ]);
     }
 
-    public function update(Request $request, User $user)
+    public function update(User $user) : RedirectResponse
     {
-        if(!$user) {
-            return response()->json([
-                'message' => 'Could not find user. Please refresh and try again!'
-            ], 404);
-        }
-
         // Precautionary check if the user is already an admin
         if ($user->role === 'admin') {
-            return response()->json([
-                'message' => 'User is already an admin.'
-            ], 400);
+            return back()->withErrors([
+                'error' => 'User is already an admin.'
+            ]);
         }
 
-        $user->role = $request->input('role', 'admin'); // default to 'admin' if role not sent
-        $user->save();
+        try {
+            $user->role = 'admin';
+            $user->save();
 
-        return response()->json([
-            'message' => 'User Promoted Successfully!',
-            'user' => $user
-        ]);
+            return back()->with(
+                'message', 'User Promoted Successfully!',
+            );
+
+        }catch (\Exception $e) {
+            Log::error('Promotion of user failed', [
+                'user' => $user,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors([
+                'error' => 'Something went wrong with promotion. Please try again.'
+            ]);
+        }
     }
 }

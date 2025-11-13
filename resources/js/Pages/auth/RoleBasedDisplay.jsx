@@ -90,7 +90,7 @@ const RoleBasedDisplay = ({auth}) => {
 
                     {user.role === 'superadmin' && (
                         <>
-                            <DropdownRoute href={"/admins"} label={'Account'} />
+                            <DropdownRoute href={"/admins"} label={'Admins'} />
                             <DropdownRoute href={"/employers"} label={'Employers'} />
                             <DropdownRoute href={"/premiumEmployers"} label={'Premium Employers'} />
                             <DropdownRoute href={"/admins/create"} label={'Promote Users'} />

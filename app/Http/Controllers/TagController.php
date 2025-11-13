@@ -6,7 +6,7 @@ use App\Models\Tag;
 use Inertia\Inertia;
 use Inertia\Response;
 
-//INERTIA COMPLETED!!
+//INERTIA COMPLETE!!
 class TagController extends Controller
 {
     public function __invoke(Tag $tag) : Response

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -12,17 +13,13 @@ class AdminController extends Controller
 {
     public function index(Request $request)
     {
-        $query = $request->input('q');
-        $adminsQuery = User::where('role', 'admin');
-
-        if($query) {
-            $adminsQuery->where('name', 'like', "%$query%");
-        }
-
-        $admins = $adminsQuery->latest();
+        [
+            'users' => $admins,
+            'query' => $query
+        ] = UserService::getUsersByRole($request, 'admin');
 
         return inertia('admin/Index',[
-            'admins' => Inertia::scroll(fn () => $admins->paginate(12)),
+            'admins' => Inertia::scroll(fn () => $admins),
             'query' => $query ?? '',
         ]);
     }
