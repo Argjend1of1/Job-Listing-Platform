@@ -5,17 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Job;
 use App\Models\Report;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ReportController extends Controller
 {
-    public function index() {
-        $reports = Report::latest()
-            ->with('job.employer.user')
-            ->get();
+    public function index() : Response
+    {
+        $reports = Report::with(['job.employer.user', 'user.employer'])
+                         ->latest();
 
-        return view('reports.index', compact('reports'));
+        return inertia('reports/Index', [
+            'reports' => Inertia::scroll(fn () => $reports->paginate(12))
+        ]);
     }
 
     public function store(Job $job)

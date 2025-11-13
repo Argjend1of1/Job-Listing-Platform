@@ -55,13 +55,11 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
 //authenticated with selected roles
 Route::middleware(['auth', 'role:user,employer,superemployer,admin'])->group(function () {
-    //!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
     Route::get('/account', [AccountController::class, 'index']);
     Route::get('/account/edit', [AccountController::class, 'edit']);
     Route::patch('/account/edit', [AccountController::class, 'update']);
     Route::delete('/account/edit', [AccountController::class, 'destroy']);
 
-    //!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
     Route::post('/jobs/{job}/report', [ReportController::class, 'store']);
 });
 
@@ -71,13 +69,11 @@ Route::middleware('auth')->group(function () {
 
 //authenticated employer, superemployer
 Route::middleware(['auth', 'role:employer,superemployer'])->group(function () {
-    //!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/dashboard/edit/{job}', [DashboardController::class, 'edit']);
     Route::patch('/dashboard/edit/{job}', [DashboardController::class, 'update']);
     Route::delete('/dashboard/edit/{job}', [DashboardController::class, 'destroy']);
 
-    //!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
     Route::get('/jobs/create', [JobController::class, 'create']);
     Route::post('/jobs/create', [JobController::class, 'store']);
 
@@ -95,7 +91,6 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     Route::get('/reports', [ReportController::class, 'index']);
 
-    //!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
     Route::delete('/jobs/{job}/destroy', [JobController::class, 'destroy']);
 });
 
