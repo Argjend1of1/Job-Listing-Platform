@@ -6,6 +6,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\Category;
 use App\Models\User;
 use App\Services\RegisterService;
+use Illuminate\Support\Facades\Log;
 
 //INERTIA COMPLETE!!
 class RegisterController extends Controller
@@ -23,18 +24,15 @@ class RegisterController extends Controller
     {
         $userAttributes = $request->validated();
 
-        try {
-            $this->service->register(
-                $userAttributes, $request->storeLogo()
-            );
+        $user = $this->service->register(
+            $userAttributes, $request->storeLogo()
+        );
 
-            return redirect('/login')
-                ->with('success', 'Registered Successfully!');
+        Log::info('User registered!', [
+            'user' => $user
+        ]);
 
-        } catch (\Exception $e) {
-            return back()->withErrors(
-                'error', $e->getMessage() ?? 'User already exists!'
-            );
-        }
+        return redirect('/login')
+            ->with('success', 'Registered Successfully!');
     }
 }

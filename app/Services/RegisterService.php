@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Employer;
 use App\Models\User;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 
 class RegisterService {
     public function storeUser(array $userAttributes, ?string $logoPath, Category $category): User
@@ -36,13 +37,18 @@ class RegisterService {
             'name', $userAttributes['category']
         )->firstOrFail();
 
-        $user = $this->storeUser($userAttributes, $logoPath, $category);
+        /**
+         * Making sure we keep the database consistent in case one resource fails creation
+         */
+        return DB::transaction(function () use ($userAttributes, $logoPath, $category) {
+            $user = $this->storeUser($userAttributes, $logoPath, $category);
 
-        if(!empty($userAttributes['employer'])) {
-            $user->update(['role' => 'employer']);
-            $this->storeEmployer($user, $userAttributes, $category);
-        }
+            if(!empty($userAttributes['employer'])) {
+                $user->update(['role' => 'employer']);
+                $this->storeEmployer($user, $userAttributes, $category);
+            }
 
-        return $user;
+            return $user;
+        });
     }
 }
