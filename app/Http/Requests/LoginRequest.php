@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ServerStatus;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class LoginRequest extends FormRequest
@@ -18,13 +22,18 @@ class LoginRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email'],
-            'password' => ['required', Password::min(6)]
+            'email'     => ['required', 'email'],
+            'password'  => ['required', Password::min(6)],
+            //example of enum usage:
+//            'enum'      =>  [
+//                Rule::enum(ServerStatus::class)
+//                    ->only([ServerStatus::Pending, ServerStatus::Active])
+//            ]
         ];
     }
 }

@@ -55,7 +55,7 @@ class JobService implements JobServiceInterface
     public function destroyJob(Job $job): void
     {
         $reported = Report::where('job_id', $job->id)->first();
-        if ($reported !== null) $reported->delete();
+        $reported?->delete();
 
         $job->delete();
     }

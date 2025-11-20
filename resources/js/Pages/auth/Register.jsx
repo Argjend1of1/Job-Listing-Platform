@@ -15,6 +15,7 @@ const Register = () => {
         password_confirmation: '',
         logo: '',
         category: '',
+        is_company: false,
         employer: ''
     });
 
@@ -25,15 +26,28 @@ const Register = () => {
         inputRef.current?.focus();
     }, []);
 
+    /**
+     * Send a post request for registering the user
+     */
     const handleRegister = (e) => {
         e.preventDefault();
         post('/register', {
             forceFormData: true,
+            preserveState:true,
+            preserveScroll:true,
             onError: () => {
                 setData('password_confirmation', '');
                 setData('password', '');
             }
         });
+    }
+
+    /**
+     *  Need the state in the backend also, hence using it on both cases.
+     */
+    const checkIsCompany = (e) => {
+        setData('is_company', e.target.checked)
+        setIsCompany(e.target.checked)
     }
 
     return (
@@ -116,8 +130,8 @@ const Register = () => {
                     <Input
                         type={"checkbox"}
                         name={"is_company"}
-                        value={isCompany}
-                        onChange={(e) => setIsCompany(e.target.checked)}
+                        value={data.is_company}
+                        onChange={checkIsCompany}
                     />
                     <span>I'm registering as a company</span>
                 </div>

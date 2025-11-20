@@ -15,7 +15,6 @@ const Login = () => {
         email: '',
         password: ''
     });
-
     const inputRef = useRef();
 
     useEffect(() => {
@@ -26,8 +25,6 @@ const Login = () => {
         e.preventDefault();
         post('/login')
     }
-
-    console.log(errors)
 
     return (
         <>

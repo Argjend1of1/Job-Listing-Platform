@@ -18,18 +18,15 @@ class SessionController extends Controller
 
     public function store(LoginRequest $request) : RedirectResponse
     {
-        $credentials = $request->validated();
-
-        if (!Auth::attempt($credentials)) {
+        if (!Auth::attempt($request->validated())) {
             return back()->withErrors([
                 'password' => 'The provided credentials are incorrect.'
             ]);
         }
 
-//        to allow testing the user logging in.
-        if ($request->hasSession()) {
-            $request->session()->regenerate();
-        }
+//      to allow testing the user logging in.
+        $request->session()->regenerate();
+
 
 //        precaution
         if (!Auth::user()) {

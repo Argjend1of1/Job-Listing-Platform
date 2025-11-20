@@ -2,20 +2,21 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
-use function PHPUnit\Framework\returnArgument;
 
 
 class RoleCheckMiddleware
 {
 
-    public function handle($request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
+        /** @var User $user */
+        $user = Auth::user();
 
-        if (!Auth::user() || !in_array(Auth::user()->role, $roles)) {
+        if (!Auth::user() || !in_array($user->role, $roles)) {
             // If it's an API request, return 403
             if ($request->expectsJson()) {
                 return response()->json([

@@ -20,7 +20,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-
         $middleware->alias([
             'web'           => StartSession::class,
             'csrf'          => VerifyCsrfToken::class,

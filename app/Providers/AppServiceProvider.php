@@ -27,12 +27,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::unguard();
-
-//        !!Commented out because we have no view only JSX through React!!
-        View::composer('*', function($view) {
-            $view->with('navbarCategories', Category::all());
-        });
-
-//        DB::statement('PRAGMA foreign_keys = ON;');
     }
 }

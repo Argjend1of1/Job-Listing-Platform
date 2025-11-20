@@ -93,6 +93,12 @@ class ResumeController extends Controller
         }
 
         return Storage::disk('local')->download($user->resume->file_path);
+
+//        alternative:
+//        return response()->download(storage_path(
+//            "app/private/{$user->resume->file_path}"),
+//            "applicant-resume-$user->id.pdf"
+//        );
     }
 
     public function getUser() : User

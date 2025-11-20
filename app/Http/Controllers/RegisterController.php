@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RegisterRequest;
 use App\Models\Category;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use PhpParser\Node\Expr\Cast\String_;
+use App\Services\RegisterService;
 
 //INERTIA COMPLETE!!
 class RegisterController extends Controller
 {
+    public function __construct(private RegisterService $service){}
+
     public function create()
     {
-//        return view('auth.register', ["categories" => Category::all()]);
         $categories = Category::all();
         return inertia(
             'auth/Register', compact('categories')
@@ -22,36 +21,12 @@ class RegisterController extends Controller
     }
     public function store(RegisterRequest $request)
     {
+        $userAttributes = $request->validated();
+
         try {
-            $userAttributes = $request->validated();
-
-            $logoPath = $request->file('logo')
-                                ->store('logos', 'public');
-
-            $category = Category::where('name', $userAttributes['category'])
-                                ->first();
-
-            $userTableAttributes = [
-                'name' => $userAttributes['name'],
-                'category_id' => $category->id,
-                'email' => $userAttributes['email'],
-                'password' => bcrypt($userAttributes['password']),
-                'logo' => $logoPath
-            ];
-
-            // Check if the 'employer' field is provided
-            if ($userAttributes['employer'] !== null) {
-                $userTableAttributes['role'] = 'employer';
-
-                $user = User::create($userTableAttributes);
-                // Create the employer record
-                $user->employer()->create([
-                    'name' => $userAttributes['employer'],
-                    'category_id' => $category->id,
-                ]);
-            }else {
-                User::create($userTableAttributes);
-            }
+            $this->service->register(
+                $userAttributes, $request->storeLogo()
+            );
 
             return redirect('/login')
                 ->with('success', 'Registered Successfully!');
