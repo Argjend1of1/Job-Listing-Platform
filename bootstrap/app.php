@@ -3,6 +3,7 @@
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RoleCheckMiddleware;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'web'           => StartSession::class,
             'csrf'          => VerifyCsrfToken::class,
             'role'          => RoleCheckMiddleware::class,
+            'verified'      => EnsureEmailIsVerified::class,
             'auth:sanctum'  => EnsureFrontendRequestsAreStateful::class,
             'guest:sanctum' => GuestMiddleware::class
         ]);

@@ -18,9 +18,13 @@ use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-//guests
+/**
+ * Unauthorized users
+ */
 Route::middleware('guest')->group(function () {
     Route::get('/login', [SessionController::class, 'index'])
         ->name('login');
@@ -38,7 +42,9 @@ Route::middleware('guest')->group(function () {
     Route::patch('/reset-password', [PasswordResetController::class, 'update']);
 });
 
-//auth with users role only
+/**
+ * Regular authenticated users
+ */
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/resume', [ResumeController::class, 'index']);
     Route::post('/resume', [ResumeController::class, 'store']);
@@ -51,8 +57,10 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/jobs/{id}/apply', [ApplicationController::class, 'store']);
 });
 
-//authenticated with selected roles
-Route::middleware(['auth', 'role:user,employer,superemployer,admin'])->group(function () {
+/**
+ * Authenticated with specified roles
+ */
+Route::middleware(['auth', 'verified', 'role:user,employer,superemployer,admin'])->group(function () {
     Route::get('/account', [AccountController::class, 'index']);
     Route::get('/account/edit', [AccountController::class, 'edit']);
     Route::patch('/account/edit', [AccountController::class, 'update']);
@@ -61,11 +69,36 @@ Route::middleware(['auth', 'role:user,employer,superemployer,admin'])->group(fun
     Route::post('/jobs/{job}/report', [ReportController::class, 'store']);
 });
 
+/**
+ * All authenticated users
+ */
 Route::middleware('auth')->group(function () {
+    Route::view(
+        '/email/verify', 'auth.verify-email'
+    )->name('verification.notice');
+
+    Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+        return to_route('home');
+    })
+    ->middleware('signed')
+    ->name('verification.verify');
+
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('message', 'Verification link sent!');
+    })
+    ->middleware(['auth', 'throttle:6,1'])
+    ->name('verification.send');
+
+
     Route::delete('/logout', [SessionController::class, 'destroy']);
 });
 
-//authenticated employer, superemployer
+/**
+ * Authenticated as an employer
+ */
 Route::middleware(['auth', 'role:employer,superemployer'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/dashboard/edit/{job}', [DashboardController::class, 'edit']);
@@ -80,7 +113,9 @@ Route::middleware(['auth', 'role:employer,superemployer'])->group(function () {
         ->name('resume.download');
 });
 
-//authenticated admin, superadmin
+/**
+ * Authenticated admins
+ */
 Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     Route::get('/employers', [EmployerController::class, 'index']);
     Route::patch('/employers/{id}', [EmployerController::class, 'update']);
@@ -92,7 +127,9 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     Route::delete('/jobs/{job}/destroy', [JobController::class, 'destroy']);
 });
 
-//authenticated superadmin
+/**
+ * Authenticated premium admin only
+ */
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/admins', [AdminController::class, 'index']);
     Route::patch('/admins/{id}', [AdminController::class, 'update']);
@@ -100,18 +137,18 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::patch('/admins/create/{user}', [UserController::class, 'update']);
 });
 
-//accessible from everyone
-Route::get('/', HomeController::class);
+/**
+ * Routes accessible by everyone.
+ */
+Route::get('/', HomeController::class)->name('home');
 Route::get('/companies', [CompanyController::class, 'index']);
 Route::get('/companies/{id}/jobs', [CompanyController::class, 'show']);
 
-Route::get('/categories/{name}', [CategoryController::class, 'index']);
-
-//!!!! Inertia Completed note: if a space between routes that route has not been checked !!!!
 Route::get('/jobs', [JobController::class, 'index']);
 Route::get('/jobs/top', [JobController::class, 'top']);
 Route::get('/jobs/more', [JobController::class, 'more']);
 Route::get('/jobs/{job}', [JobController::class, 'show']);
 
-Route::get('/tags/{tag:name}', TagController::class);//{tag:name} - frontend
+Route::get('/categories/{name}', [CategoryController::class, 'index']);
+Route::get('/tags/{tag:name}', TagController::class);
 

@@ -7,6 +7,7 @@ use App\Models\Job;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class JobService implements JobServiceInterface
 {
@@ -54,10 +55,12 @@ class JobService implements JobServiceInterface
 
     public function destroyJob(Job $job): void
     {
-        $reported = Report::where('job_id', $job->id)->first();
-        $reported?->delete();
+        DB::transaction(function () use ($job) {
+            $reported = Report::where('job_id', $job->id)->first();
+            $reported?->delete();
 
-        $job->delete();
+            $job->delete();
+        });
     }
 
     public function applySearch($jobsQuery, string $query)

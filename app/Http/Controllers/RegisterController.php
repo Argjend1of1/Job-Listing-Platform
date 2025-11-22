@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Models\Category;
-use App\Models\User;
 use App\Services\RegisterService;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 //INERTIA COMPLETE!!
@@ -28,11 +29,14 @@ class RegisterController extends Controller
             $userAttributes, $request->storeLogo()
         );
 
+        Auth::login($user, true);
+        event(new Registered($user));
+
         Log::info('User registered!', [
             'user' => $user
         ]);
 
-        return redirect('/login')
+        return redirect('/account')
             ->with('success', 'Registered Successfully!');
     }
 }

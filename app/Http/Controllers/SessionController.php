@@ -35,7 +35,7 @@ class SessionController extends Controller
             ]);
         }
 
-        return redirect('/')
+        return redirect('/account')
             ->with('success', "Logged In Successfully!");
     }
 

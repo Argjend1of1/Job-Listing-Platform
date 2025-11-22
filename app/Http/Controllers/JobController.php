@@ -6,6 +6,7 @@ use App\Contracts\JobServiceInterface;
 use App\Http\Requests\JobRequest;
 use App\Models\Job;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -63,15 +64,15 @@ class JobController extends Controller
             return redirect('/jobs')->with(
                 'completed', 'Job deleted successfully!'
             );
-        }catch (\Exception $e) {
-            Log::error('Could not remove job.', [
+        }catch (ModelNotFoundException $e) {
+            Log::info('Report Model not found.', [
                 'user' => User::current(),
                 'job' => $job->id,
                 'error' => $e->getMessage(),
             ]);
 
             return redirect('/jobs')->with(
-                'error', 'An unexpected error occurred while removing this job. Please try again later.'
+                'error', 'Job or related report not found.'
             );
         }
     }
