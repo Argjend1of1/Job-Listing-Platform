@@ -20,6 +20,8 @@ const Index = () => {
         post('/forgot-password')
     }
 
+    console.log(errors);
+
     return (
         <>
             <PageHeading title={'Reset Your Password'} />

@@ -14,6 +14,7 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PremiumEmployerController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TagController;
@@ -34,12 +35,23 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create']);
     Route::post('/register', [RegisterController::class, 'store']);
 
-    Route::get('/forgot-password', [PasswordResetController::class, 'index']);
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendEmail']);
-    Route::get('/forgot-password/index', [PasswordResetController::class, 'wait']);
+    /**
+     * Resetting a users' password
+     */
+    Route::get('/forgot-password', [ResetPasswordController::class, 'index'])
+        ->name('password.request');
 
-    Route::get('/reset-password', [PasswordResetController::class, 'edit']);
-    Route::patch('/reset-password', [PasswordResetController::class, 'update']);
+    Route::post('/forgot-password', [ResetPasswordController::class, 'store'])
+        ->name('password.email');
+
+    Route::get('/forgot-password/email-sent', [ResetPasswordController::class, 'wait'])
+        ->name('password.request');
+
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'edit'])
+        ->name('password.reset');
+
+    Route::post('/reset-password', [ResetPasswordController::class, 'update'])
+        ->name('password.update');
 });
 
 /**

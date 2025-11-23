@@ -41,10 +41,7 @@ class PasswordResetController extends Controller
         );
     }
 
-    public function wait() : Response
-    {
-        return inertia('password/Wait');
-    }
+
 
     public function edit(Request $request) : Response
     {
