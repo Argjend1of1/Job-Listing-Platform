@@ -1,5 +1,6 @@
-import {Link} from "@inertiajs/react";
+import {Link, usePage} from "@inertiajs/react";
 import PageHeading from "@/Pages/components/body/PageHeading.jsx";
+import {showSuccess} from "@/reusableFunctions/alertUser.js";
 
 const Index = ({ user }) => {
     const {employer} = user;

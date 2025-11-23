@@ -7,6 +7,7 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\EmployerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
@@ -85,13 +86,19 @@ Route::middleware(['auth', 'verified', 'role:user,employer,superemployer,admin']
  * All authenticated users
  */
 Route::middleware('auth')->group(function () {
-    Route::view(
-        '/email/verify', 'auth.verify-email'
-    )->name('verification.notice');
+
+    /**
+     * Email verification process.
+     */
+    Route::get('/email/verify', function () {
+        return inertia('auth/VerifyEmail');
+    })->name('verification.notice');
 
     Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill();
-        return to_route('home');
+        return redirect()
+            ->intended('/')
+            ->with('success', 'Email verified successfully. You may proceed.');
     })
     ->middleware('signed')
     ->name('verification.verify');
@@ -99,9 +106,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/email/verification-notification', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
 
-        return back()->with('message', 'Verification link sent!');
+        return back()->with('message', 'Verification link sent. Please check your email!');
     })
-    ->middleware(['auth', 'throttle:6,1'])
+    ->middleware(['throttle:6,1'])
     ->name('verification.send');
 
 
