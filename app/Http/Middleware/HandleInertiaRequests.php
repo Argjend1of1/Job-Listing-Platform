@@ -46,7 +46,10 @@ class HandleInertiaRequests extends Middleware
                             'logo' => new UserLogo($request->user())
                         ]
                     )
-                    : null
+                    : null,
+//                'permissions' => [
+//                    'create' =>$request->user()->can('create', Job::class),
+//                ]
 
             ],
             'flash' => [

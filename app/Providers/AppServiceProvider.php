@@ -27,5 +27,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::unguard();
+
+        /**
+         * Reminder to put a variable into fillables, when we want to mass assign a property
+         */
+        Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
+
+
     }
 }

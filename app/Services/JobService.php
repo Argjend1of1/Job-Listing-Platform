@@ -65,14 +65,14 @@ class JobService implements JobServiceInterface
 
     public function applySearch($jobsQuery, string $query)
     {
-        return $jobsQuery->where(function ($q) use ($query) {
-            $q->where('title', 'like', "%$query%")
-                ->orWhere('location', 'like', "%$query%")
-                ->orWhere('schedule', 'like', "%$query%")
-                ->orWhere('about', 'like', "%$query%")
-                ->orWhereHas('employer', function ($q) use ($query) {
-                    $q->where('name', 'like', "%$query%");
-                });
+        return $jobsQuery->whereAny([
+            'title',
+            'location',
+            'schedule',
+            'about'
+        ], 'like', "%$query%")
+        ->orWhereHas('employer', function ($q) use ($query) {
+            $q->where('name', 'like', "%$query%");
         });
     }
 

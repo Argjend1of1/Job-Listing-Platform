@@ -34,6 +34,9 @@ class UserController extends Controller
             $user->role = 'admin';
             $user->save();
 
+//            dd($user->getChanges());
+//            dd($user->getPrevious());
+
             return back()->with(
                 'message', 'User Promoted Successfully!',
             );
