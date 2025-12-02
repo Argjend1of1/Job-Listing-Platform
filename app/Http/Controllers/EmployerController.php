@@ -17,10 +17,16 @@ class EmployerController extends Controller
     {
         $searchQuery = $request->input('q');
 
-        $employers = Employer::withUserFilter(search: $searchQuery);
+        /**
+         * We should not pass the query on a scope.
+         * The yellow line should be fixed on a future update by PhpStorm
+         */
+        $employers = Employer::withUserFilter(
+            'employer', $searchQuery
+        )->paginate(12);
 
         return inertia('employer/Index', [
-            'employers' => Inertia::scroll(fn () => $employers->paginate(12)),
+            'employers' => Inertia::scroll(fn () => $employers),
             'query' => $searchQuery ?? ''
         ]);
     }

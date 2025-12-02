@@ -17,9 +17,7 @@ class PremiumEmployerController extends Controller
     public function index(Request $request)
     {
         $searchQuery = $request->input('q');
-        $premiumEmployers = Employer::withUserFilter(
-            'superemployer', $searchQuery
-        );
+        $premiumEmployers = Employer::withUserFilter('superemployer', $searchQuery,);
 
         return inertia('employer/IndexPremium', [
             'employers' => Inertia::scroll(fn () => $premiumEmployers->paginate(12)),

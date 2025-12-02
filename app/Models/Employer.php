@@ -3,26 +3,31 @@
 namespace App\Models;
 
 use Database\Factories\EmployerFactory;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
+
 
 class Employer extends Model
 {
     /** @use HasFactory<EmployerFactory> */
     use HasFactory;
 
-    public function scopeWithUserFilter(
-        $query, string $role = 'employer' , string $search = null
-    ){
-        return $query->whereHas('user', function ($q) use ($search, $role) {
+    #[Scope]
+    protected function withUserFilter(
+        Builder $query,
+        string $role = 'employer',
+        ?string $search = null
+    ): Builder
+    {
+        return $query->whereHas('user', function ($q) use ($role, $search) {
             $q->where('role', $role);
 
             if ($search) {
-                $q->where('name', 'like', "%{$search}%");
-                // Add more orWhere() conditions here if needed
+                $q->whereAny(['name', 'role'], 'like', "%{$search}%");
             }
         })
         ->with('user')
