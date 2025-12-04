@@ -45,8 +45,9 @@ class JobController extends Controller
             $request->validated(),
         );
 
-        return redirect('/dashboard')
-            ->with('success', "Job Listed Successfully!");
+        return redirect('/dashboard')->with(
+            'success', "Job Listed Successfully!"
+        );
     }
 
     public function show(Job $job) : ResponseFactory|Response

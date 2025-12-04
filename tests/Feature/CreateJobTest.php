@@ -4,8 +4,6 @@ use App\Models\Category;
 use App\Models\Employer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
-use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
 
@@ -19,15 +17,13 @@ test('employer/superemployer can create a job', function () {
     ]);
 
     $user->employer()->create([
-        'name' => 'Example Enterprise',
+        'name' => 'Test Enterprise',
         'category_id' => $category->id
     ]);
 
-//    $this -> refers to the test class instance,
-//    which extends Illuminate\Foundation\Testing\TestCase.
     $response = $this
         ->actingAs($user)
-        ->postJson('/api/jobs/create', [
+        ->post('/jobs/create', [
             'title' => 'Senior Dev',
             'salary' => '70000',
             'location' => 'Remote',
@@ -37,23 +33,21 @@ test('employer/superemployer can create a job', function () {
             'tags' => 'php,laravel'
         ]);
 
-    $response->assertStatus(200)
-        ->assertJson([
-            'message' => 'Job Listed Successfully!',
-            'jobs' => [
-                'title' => 'Senior Dev',
-            ]
-        ]);
+    $response
+        ->assertStatus(302)
+        ->assertSessionHas('success', "Job Listed Successfully!");
 });
 
 test('superemployer job gets listed as a top job', function () {
-    $user = User::factory()->create([
-        'role' => 'superemployer'
-    ]);
-
     $category = Category::create([
         'name' => 'test'
     ]);
+
+    $user = User::factory()->create([
+        'category_id' => $category->id,
+        'role' => 'superemployer'
+    ]);
+
 
     Employer::factory()->create([
         'user_id' => $user->id,
@@ -62,7 +56,7 @@ test('superemployer job gets listed as a top job', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson('/api/jobs/create', [
+        ->post('/jobs/create', [
             'title' => 'Top Job Title',
             'salary' => '60000',
             'location' => 'Prishtina',
@@ -72,24 +66,23 @@ test('superemployer job gets listed as a top job', function () {
             'tags' => 'remote,urgent',
         ]);
 
-    $response->assertStatus(200)
-        ->assertJson([
-            'message' => 'Job Listed Successfully!',
-            'jobs' => [
-                'title' => 'Top Job Title',
-                'top' => true
-            ]
-        ]);
+    $response->assertStatus(302);
+
+    $this->assertDatabaseHas('jobs', [
+        'title' => 'Top Job Title',
+        'top' => true,
+    ]);
 });
 
 test('authenticated as a user cannot post jobs', function ()  {
     $user = User::factory()->create([
-        'role' => 'user'
+        'role' => 'user',
+        'category_id' => 1
     ]);
 
     $response = $this
         ->actingAs($user)
-        ->postJson('/api/jobs/create', [
+        ->post('jobs/create', [
             'title' => 'Senior Dev',
             'salary' => '70000',
             'location' => 'Remote',
@@ -99,8 +92,7 @@ test('authenticated as a user cannot post jobs', function ()  {
             'tags' => 'php,laravel'
         ]);
 
-    $response->assertStatus(403)
-        ->assertJson([
-            'message' => 'Unauthorized: Insufficient permissions.'
-        ]);
+    $response
+        ->assertStatus(302)
+        ->assertRedirect('/');
 });

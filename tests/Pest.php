@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\WithCachedConfig;
+use Illuminate\Foundation\Testing\WithCachedRoutes;
 
 
 /*

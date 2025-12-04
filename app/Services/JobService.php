@@ -38,12 +38,6 @@ class JobService implements JobServiceInterface
             Arr::except($attributes, 'tags')
         );
 
-        if($attributes['tags']) {
-            foreach (explode(',', strtolower($attributes['tags'])) as $tag) {
-                $job->tag($tag);
-            }
-        }
-
         if (!empty($attributes['tags'])) {
             foreach (explode(',', strtolower($attributes['tags'])) as $tag) {
                 $job->tag($tag);
