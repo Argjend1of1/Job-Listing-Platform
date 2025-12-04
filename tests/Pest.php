@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Testing\WithCachedConfig;
+
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -12,7 +15,8 @@
 */
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(WithCachedConfig::class)
+//    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -43,5 +47,5 @@ expect()->extend('toBeOne', function () {
 
 function something()
 {
-    // ..
+
 }

@@ -151,7 +151,7 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
  */
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/admins', [AdminController::class, 'index']);
-    Route::patch('/admins/{id}', [AdminController::class, 'update']);
+    Route::patch('/admins/{admin}', [AdminController::class, 'update']);
     Route::get('/admins/create', [UserController::class, 'index']);
     Route::patch('/admins/create/{user}', [UserController::class, 'update']);
 });

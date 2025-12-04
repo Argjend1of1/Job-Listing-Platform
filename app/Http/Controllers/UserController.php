@@ -29,27 +29,20 @@ class UserController extends Controller
 
     public function update(User $user) : RedirectResponse
     {
+        $user->update([
+            'role' => 'admin'
+        ]);
 
-        try {
-            $user->role = 'admin';
-            $user->save();
+        Log::info('User promoted to admin', [
+            'target_user_id' => $user->id,
+            'performed_by' => auth()->id(),
+        ]);
 
-//            dd($user->getChanges());
-//            dd($user->getPrevious());
+//        dd($user->getChanges());
+//        dd($user->getPrevious());
 
-            return back()->with(
-                'message', 'User Promoted Successfully!',
-            );
-
-        }catch (\Exception $e) {
-            Log::error('Promotion of user failed', [
-                'user' => $user,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->withErrors([
-                'error' => 'Something went wrong with promotion. Please try again.'
-            ]);
-        }
+        return back()->with(
+            'message', 'User Promoted Successfully!',
+        );
     }
 }

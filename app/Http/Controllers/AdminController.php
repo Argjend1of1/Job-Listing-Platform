@@ -4,14 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Inertia\Response;
 
 //InertiaComplete
 class AdminController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         [
             'users' => $admins,
@@ -24,32 +26,14 @@ class AdminController extends Controller
         ]);
     }
 
-    public function update(string $id)
+    public function update(User $admin): RedirectResponse
     {
-        try {
-            /** @var User $user */
-            $user = User::findOrFail($id);
-            if(!$user) {
-                return back()->with([
-                    'error', 'Could not find user.'
-                ]);
-            }
-            $user->role = 'user';
-            $user->save();
+        $admin->update([
+            'role' => 'user'
+        ]);
 
-            return back()->with([
-                'message' => "Admin Demoted Successfully!"
-            ]);
-
-        }catch (\Exception $e) {
-            Log::error('Could not demote user', [
-                'user' => $user,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with([
-                'error' => "Something unexpected happened. Please try again."
-            ]);
-        }
+        return back()->with(
+            'message', "Admin Demoted Successfully!"
+        );
     }
 }
