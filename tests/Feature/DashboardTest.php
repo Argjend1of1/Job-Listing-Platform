@@ -2,15 +2,13 @@
 
 use App\Models\Employer;
 use App\Models\Job;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as AssertableInertia;
 
 uses(RefreshDatabase::class);
 
 test('employer can access the dashboard', function () {
-    $user = User::factory()->create([
-        'role' => 'employer'
-    ]);
+    $user = createUser('employer');
 
     Employer::factory()->create([
         'user_id' => $user->id
@@ -18,26 +16,34 @@ test('employer can access the dashboard', function () {
 
     $response = $this
         ->actingAs($user)
-        ->getJson('/api/dashboard');
+        ->get('/dashboard');
 
-    $response->assertStatus(200)
-        ->assertExactJson([
-            'user' => $user->fresh()->load('employer.job')->toArray(),
-            'jobs' => [],
-            'message' => '(super)employer can access dashboard!',
-        ]);
+    $response
+        ->assertStatus(200)
+        ->assertInertia(function (AssertableInertia $page) use ($user) {
+            $page
+                ->component('dashboard/Index')
+                ->has('user', fn($userProp) =>
+                    $userProp
+                        ->where('id', $user->id)
+                        ->where('role', 'employer')
+                        ->etc()
+                )
+                ->has('logo')
+                ->has('jobs');
+        });
 });
 
 test('other roles beside (super)employer cannot access dashboard', function () {
-    $user = User::factory()->create([
-        'role' => 'admin'
-    ]);
+    $user = createUser('admin');
 
     $response = $this
         ->actingAs($user)
-        ->getJson('/api/dashboard');
+        ->get('/dashboard');
 
-    $response->assertStatus(403);
+    $response
+        ->assertStatus(302)
+        ->assertRedirect('/');
 });
 
 test('employer can edit their job', function () {
@@ -48,7 +54,7 @@ test('employer can edit their job', function () {
 
     $response = $this
         ->actingAs($user)
-        ->patchJson("/api/dashboard/edit/$job->id", [
+        ->patch("/dashboard/edit/$job->id", [
             'title' => 'Updated Title',
             'schedule' => 'Full Time',
             'about' => 'This is a new job description.',
@@ -56,14 +62,33 @@ test('employer can edit their job', function () {
         ]);
 
     $response
-        ->assertStatus(200)
-        ->assertJson([
-            'message' => 'Job updated successfully!',
-            'job' => [
-                'title' => 'Updated Title',
-                'salary' => '3000'
-            ]
+        ->assertStatus(302)
+        ->assertSessionHas('success', 'Listing updated successfully!');
+});
+
+test("employer cannot edit others' jobs", function () {
+    [
+        'user' => $user,
+        'job' => $job
+    ] = createUserWithJob();
+
+    [
+        'user' => $user2,
+        'job' => $job2
+    ] = createUserWithJob();
+
+    $response = $this
+        ->actingAs($user)
+        ->patch("/dashboard/edit/$job2->id", [
+            'title' => 'Updated Title',
+            'schedule' => 'Full Time',
+            'about' => 'This is a new job description.',
+            'salary' => '3000'
         ]);
+
+    $response
+        ->assertStatus(302)
+        ->assertRedirect('/');
 });
 
 test('employer can delete his job', function () {
@@ -74,49 +99,47 @@ test('employer can delete his job', function () {
 
     $response = $this
         ->actingAs($user)
-        ->deleteJson("/api/dashboard/edit/$job->id");
+        ->delete("/dashboard/edit/$job->id");
 
     $response
-        ->assertStatus(200)
-        ->assertJson([
-            'message' => 'Listing deleted successfully!'
-        ]);
+        ->assertStatus(302)
+        ->assertRedirect('/dashboard')
+        ->assertSessionHas('success', 'Listing deleted successfully!');
 });
 
 test("employer cannot delete others' jobs", function () {
     [
         'user' => $user,
         'job' => $job
-    ] = createUserWithJob(false);
+    ] = createUserWithJob();
+
+    [
+        'user' => $user2,
+        'job' => $job2
+    ] = createUserWithJob();
 
     $response = $this
         ->actingAs($user)
-        ->deleteJson("/api/dashboard/edit/$job->id");
+        ->delete("/api/dashboard/edit/$job2->id");
 
     $response
-        ->assertStatus(403)
-        ->assertJson([
-            'message' => "Unauthorized to remove others' jobs!"
-        ]);
+        ->assertStatus(302)
+        ->assertRedirect('/');
 });
 
-function createUserWithJob($isOwner = true): array
+function createUserWithJob(): array
 {
-    $user = User::factory()->create([
-        'role' => 'employer'
-    ]);
+    $user = createUser('employer');
 
-    Employer::factory()->create([
-        'user_id' => $user->id
+    $employer = Employer::factory()->create([
+        'user_id' => $user->id,
+        'category_id' => $user->category_id
     ]);
-
-    if(!$isOwner) {
-        $employer = Employer::factory()->create();
-    }
 
     $job = Job::factory()->create([
-        'employer_id' => $isOwner ? $user->employer->id : $employer->id
+        'employer_id' => $employer->id
     ]);
 
     return compact('user', 'job');
 }
+

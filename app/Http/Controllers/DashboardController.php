@@ -8,12 +8,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Response;
 
 
 //Inertia COMPLETED
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         /** @var User $user */
         $user = User::with('employer.job.tags')
