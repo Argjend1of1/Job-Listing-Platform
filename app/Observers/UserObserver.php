@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Add `ShouldHandleEventsAfterCommit` if you will deal with Database Transactions for this specific resource.
- * It will make sure to dispatch an event, only after the transactions is completed.
+ * It will make sure to dispatch an event, only after the transactions is wrapped completely.
  */
 class UserObserver /* implements ShouldHandleEventsAfterCommit */
 {

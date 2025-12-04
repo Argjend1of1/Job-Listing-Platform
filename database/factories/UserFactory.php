@@ -2,13 +2,15 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Random\RandomException;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -26,7 +28,7 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'category_id' => 1,
+            'category_id' => Category::inRandomOrder()->value('id'),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -34,6 +36,28 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
         ];
     }
+
+    /**
+     * Configure the model factory.
+     */
+//    public function configure()
+//    {
+//        return $this->afterCreating(function (User $user) {
+//            //...
+//        });
+//    }
+
+    /**
+     * Indicate that the user is suspended.
+     */
+//    public function suspended(): Factory
+//    {
+//        return $this->state(function (array $attributes) {
+//            return [
+//                'account_status' => 'suspended',
+//            ];
+//        });
+//    }
 
     /**
      * Indicate that the model's email address should be unverified.

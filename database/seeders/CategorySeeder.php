@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -12,6 +13,11 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
+        if (Category::where('name', 'Technology and IT')->exists()) {
+            $this->command->info('Categories already instantiated!');
+            return;
+        }
+
         $categories = [
             'Technology and IT',
             'Healthcare and Life Sciences',
