@@ -18,7 +18,6 @@ test('authenticated with user role can apply for a job', function () {
     $user = User::factory()->create([
         'role' => 'user'
     ]);
-    $this->actingAs($user);
 
     $fakeResume = UploadedFile::fake()->create('resume.pdf');
     $path = $fakeResume->store('resumes', 'local');
@@ -35,12 +34,15 @@ test('authenticated with user role can apply for a job', function () {
         'file_path' => $path
     ]);
 
-    $response = $this->postJson('/api/jobs/' . $job->id . '/apply');
+    $response = $this
+        ->actingAs($user)
+        ->post('/jobs/' . $job->id . '/apply');
 
-    $response->assertStatus(200)
-        ->assertJson([
-            'message' => 'Application submitted successfully!'
-        ]);
+    $response
+        ->assertStatus(302)
+        ->assertSessionHas(
+            'completed', 'Application submitted successfully!'
+        );
 
     $this->assertDatabaseHas('applications', [
         'user_id' => $user->id,
@@ -51,46 +53,46 @@ test('authenticated with user role can apply for a job', function () {
 test('unauthenticated user cannot apply for a job', function () {
     $job = Job::factory()->create();
 
-    $response = $this->postJson("/api/jobs/$job->id/apply");
+    $response = $this->post("/jobs/$job->id/apply");
 
     $response
-        ->assertStatus(401)
-        ->assertJson([
-            'message' => 'You need to be logged in to apply for this job!'
-        ]);
+        ->assertStatus(302)
+        ->assertRedirect('/login');
 });
 
 test('user cannot apply without resume', function () {
     $job = Job::factory()->create();
     $user = User::factory()->create([
-        'name' => 'testUser'
+        'role' => 'user'
     ]);
 
     $response = $this
         ->actingAs($user)
-        ->postJson("/api/jobs/$job->id/apply");
+        ->post("/jobs/$job->id/apply");
 
     $response
-        ->assertStatus(422)
-        ->assertJson([
-            'message' => 'Please upload your resume before applying!'
-        ]);
+        ->assertStatus(302)
+        ->assertSessionHas(
+            'message', 'Please upload your resume before applying!'
+        );
 });
 
 test('user cannot apply twice for the same job', function () {
     $job = Job::factory()->create();
     $user = User::factory()->create([
-        'name' => 'testUser'
+        'role' => 'user'
     ]);
 
     $fakeResume = UploadedFile::fake()->create('resume.pdf');
     $path = $fakeResume->store('resumes', 'local');
 
+    /**
+     * Insert the Resume and Application first and then send the request
+     */
     Resume::create([
         'user_id' => $user->id,
         'file_path' => $path
     ]);
-
     Application::create([
         'user_id' => $user->id,
         'job_id' => $job->id
@@ -105,11 +107,11 @@ test('user cannot apply twice for the same job', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson("/api/jobs/$job->id/apply");
+        ->post("/jobs/$job->id/apply");
 
     $response
-        ->assertStatus(404)
-        ->assertJson([
-            'message' => 'You already applied for this Job!'
-        ]);
+        ->assertStatus(302)
+        ->assertSessionHas(
+            'message', 'You already applied for this job!'
+        );
 });

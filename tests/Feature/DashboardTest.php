@@ -3,7 +3,7 @@
 use App\Models\Employer;
 use App\Models\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia as AssertableInertia;
+use Inertia\Testing\AssertableInertia;
 
 uses(RefreshDatabase::class);
 

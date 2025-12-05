@@ -31,35 +31,23 @@ class ApplicationController extends Controller
             );
         }
 
-        try {
-            Application::create([
-                'user_id' => $user->id,
-                'job_id' => $id,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+        Application::create([
+            'user_id' => $user->id,
+            'job_id' => $id,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
 
-//        if the user had this particular job
-            if ($user->bookmarkedJobs()->where('job_id', $id)->exists()) {
-                $user->bookmarkedJobs()->detach($id);
-            }
-
-
-            return back()->with([
-                'completed' => 'Application submitted successfully!'
-            ]);
-        }catch (\Exception $e) {
-            // Optionally log for debugging
-            Log::error('Application creation failed', [
-                'user_id' => $user->id,
-                'job_id'  => $id,
-                'error'   => $e->getMessage(),
-            ]);
-
-            return back()->with(
-                'error', 'An unexpected error occurred while applying. Please try again later.'
-            );
+        /**
+         * If the job was bookmarked, after application is submitted remove it.
+         */
+        if ($user->bookmarkedJobs()->where('job_id', $id)->exists()) {
+            $user->bookmarkedJobs()->detach($id);
         }
+
+        return back()->with(
+            'completed', 'Application submitted successfully!'
+        );
     }
 
     /*
