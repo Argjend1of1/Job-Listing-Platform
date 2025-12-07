@@ -51,6 +51,7 @@ test('admin can demote a superemployer', function () {
 test('admin can delete an employer', function () {
     $admin = createUser('admin');
     $employer = Employer::factory()->create();
+    $this->assertModelExists($employer);
 
     $response = $this
         ->actingAs($admin)
@@ -58,13 +59,12 @@ test('admin can delete an employer', function () {
 
     $response
         ->assertStatus(302)
+        ->assertRedirectBack()
         ->assertSessionHas(
             'message', 'Employer removed successfully!'
         );
 
-    $this->assertDatabaseMissing('employers', [
-        'id' => $employer->id
-    ]);
+    $this->assertModelMissing($employer);
 });
 
 test("other roles are denied from updating employers' role", function () {

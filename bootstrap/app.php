@@ -82,4 +82,8 @@ return Application::configure(basePath: dirname(__DIR__))
             // Default: return the response untouched
             return $response;
         });
-    })->create();
+    })
+    ->withCommands([
+        //example registration of a command
+//        __DIR__.'/../app/Domain/Orders/Commands'
+    ])->create();
