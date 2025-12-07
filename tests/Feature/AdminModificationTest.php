@@ -14,6 +14,7 @@ test('superadmin can promote user to admin', function () {
 
     $response
         ->assertStatus(302)
+        ->assertRedirectBack()
         ->assertSessionHas('message', 'User Promoted Successfully!');
 
     $user->refresh();
@@ -30,6 +31,7 @@ test('superadmin can demote an admin', function () {
 
     $response
         ->assertStatus(302)
+        ->assertRedirectBack()
         ->assertSessionHas(
             'message', "Admin Demoted Successfully!"
         );

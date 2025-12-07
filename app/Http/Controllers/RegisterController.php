@@ -9,7 +9,6 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-//INERTIA COMPLETE!!
 class RegisterController extends Controller
 {
     public function __construct(private RegisterService $service){}

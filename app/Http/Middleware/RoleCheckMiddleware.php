@@ -25,7 +25,9 @@ class RoleCheckMiddleware
             }
 
             // Otherwise, redirect for web requests
-            return redirect('/');
+            return redirect('/')->with(
+                'message', 'You are not authorized for this action!'
+            );
         }
 
 //        if in_array pass the request along through the callback $next

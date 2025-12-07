@@ -9,18 +9,19 @@ uses(RefreshDatabase::class);
 test('admin can promote an employer', function () {
     $admin = createUser('admin');
     $user = createUser('employer');
+    $employer = Employer::factory()->create([
+        'user_id' => $user->id
+    ]);
 
     $response = $this
         ->actingAs($admin)
-        ->patchJson("/api/employers/$user->id", [
-            'role' => 'superemployer'
-        ]);
+        ->patch("/employers/$employer->id");
 
     $response
-        ->assertStatus(200)
-        ->assertJson([
-            'message' => 'Employer Promoted Successfully!'
-        ]);
+        ->assertStatus(302)
+        ->assertSessionHas(
+            'message', 'Employer Promoted Successfully!'
+        );
 
     $user->refresh();
     expect($user->role)->toBe('superemployer');
@@ -29,61 +30,55 @@ test('admin can promote an employer', function () {
 test('admin can demote a superemployer', function () {
     $admin = createUser('admin');
     $user = createUser('superemployer');
-    Employer::factory()->create([
+    $employer = Employer::factory()->create([
         'user_id' => $user->id
     ]);
 
     $response = $this
         ->actingAs($admin)
-        ->patchJson("/api/premiumEmployers/$user->id", [
-            'role' => 'employer'
-        ]);
+        ->patch("/employers/$employer->id");
 
     $response
-        ->assertStatus(200)
-        ->assertJson([
-            'message' => 'Superemployer Demoted Successfully!'
-        ]);
+        ->assertStatus(302)
+        ->assertSessionHas(
+            'message', 'Employer Demoted Successfully!'
+        );
 
     $user->refresh();
     expect($user->role)->toBe('employer');
 });
 
-test('admin can delete employer', function () {
-    $user = createUser('admin');
+test('admin can delete an employer', function () {
+    $admin = createUser('admin');
     $employer = Employer::factory()->create();
 
     $response = $this
-        ->actingAs($user)
-        ->deleteJson("/api/employers/$employer->id");
+        ->actingAs($admin)
+        ->delete("/employers/$employer->id");
 
     $response
-        ->assertStatus(200)
-        ->assertJson([
-            'message' => 'Employer deleted successfully!'
-        ]);
+        ->assertStatus(302)
+        ->assertSessionHas(
+            'message', 'Employer removed successfully!'
+        );
+
+    $this->assertDatabaseMissing('employers', [
+        'id' => $employer->id
+    ]);
 });
 
-test('other roles receive a 403 when trying to edit an employer', function () {
+test("other roles are denied from updating employers' role", function () {
     $user = createUser('employer');
     $employer = Employer::factory()->create();
 
     $response = $this
         ->actingAs($user)
-        ->patchJson("/api/employers/$employer->id");
+        ->patch("/employers/$employer->id");
 
-    $response->assertStatus(403);
-});
-
-test('other roles receive a 403 when trying to delete an employer', function () {
-    $user = createUser('superemployer');
-    $employer = Employer::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->deleteJson("/api/employers/$employer->id");
-
-    $response->assertStatus(403);
+    $response
+        ->assertStatus(302)
+        ->assertRedirect('/')
+        ->assertSessionHas('message', 'You are not authorized for this action!');
 });
 
 function createUser($role, $id = 1){

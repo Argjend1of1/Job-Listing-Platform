@@ -11,16 +11,8 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 test('authenticated with user role can apply for a job', function () {
-    Storage::fake('local');
-
-    $job = Job::factory()->create();
-
-    $user = User::factory()->create([
-        'role' => 'user'
-    ]);
-
-    $fakeResume = UploadedFile::fake()->create('resume.pdf');
-    $path = $fakeResume->store('resumes', 'local');
+    [$job, $user] = createData();
+    $path = createStorageAndResume();
 
     Resume::create([
         'user_id' => $user->id,
@@ -40,6 +32,7 @@ test('authenticated with user role can apply for a job', function () {
 
     $response
         ->assertStatus(302)
+        ->assertRedirectBack()
         ->assertSessionHas(
             'completed', 'Application submitted successfully!'
         );
@@ -61,10 +54,7 @@ test('unauthenticated user cannot apply for a job', function () {
 });
 
 test('user cannot apply without resume', function () {
-    $job = Job::factory()->create();
-    $user = User::factory()->create([
-        'role' => 'user'
-    ]);
+    [$job, $user] = createData();
 
     $response = $this
         ->actingAs($user)
@@ -72,19 +62,15 @@ test('user cannot apply without resume', function () {
 
     $response
         ->assertStatus(302)
+        ->assertRedirectBack()
         ->assertSessionHas(
             'message', 'Please upload your resume before applying!'
         );
 });
 
 test('user cannot apply twice for the same job', function () {
-    $job = Job::factory()->create();
-    $user = User::factory()->create([
-        'role' => 'user'
-    ]);
-
-    $fakeResume = UploadedFile::fake()->create('resume.pdf');
-    $path = $fakeResume->store('resumes', 'local');
+    [$job, $user] = createData();
+    $path = createStorageAndResume();
 
     /**
      * Insert the Resume and Application first and then send the request
@@ -115,3 +101,22 @@ test('user cannot apply twice for the same job', function () {
             'message', 'You already applied for this job!'
         );
 });
+
+function createData(): array
+{
+    $job = Job::factory()->create();
+    $user = User::factory()->create([
+        'role' => 'user'
+    ]);
+
+    return [$job, $user];
+}
+
+function createStorageAndResume(): string
+{
+    Storage::fake('local');
+    $fakeResume = UploadedFile::fake()->create('resume.pdf');
+    return $fakeResume->store('resumes', 'local');
+}
+
+

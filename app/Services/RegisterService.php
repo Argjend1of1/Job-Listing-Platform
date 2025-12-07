@@ -3,9 +3,7 @@
 namespace App\Services;
 
 use App\Models\Category;
-use App\Models\Employer;
 use App\Models\User;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 class RegisterService {

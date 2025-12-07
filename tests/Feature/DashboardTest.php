@@ -19,7 +19,7 @@ test('employer can access the dashboard', function () {
         ->get('/dashboard');
 
     $response
-        ->assertStatus(200)
+        ->assertOk()
         ->assertInertia(function (AssertableInertia $page) use ($user) {
             $page
                 ->component('dashboard/Index')
