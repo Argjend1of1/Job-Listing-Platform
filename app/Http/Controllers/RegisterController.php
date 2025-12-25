@@ -6,6 +6,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\Category;
 use App\Services\RegisterService;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +21,7 @@ class RegisterController extends Controller
             'auth/Register', compact('categories')
         );
     }
-    public function store(RegisterRequest $request)
+    public function store(RegisterRequest $request): RedirectResponse
     {
         $userAttributes = $request->validated();
 

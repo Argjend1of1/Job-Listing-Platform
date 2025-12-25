@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Category;
-use App\Models\Employer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -17,6 +16,7 @@ test('employer/superemployer can create a job', function () {
 
     $response
         ->assertStatus(302)
+        ->assertRedirect('/dashboard')
         ->assertSessionHas('success', "Job Listed Successfully!");
 });
 
@@ -59,7 +59,7 @@ function postJob(User $user, array $overrides = [])
         'location' => 'Remote',
         'schedule' => 'Full Time',
         'about' => 'We are hiring!',
-        'url' => 'https://example.com',
+        'url' => 'https://facebook.com',
         'tags' => 'php,laravel',
     ];
 

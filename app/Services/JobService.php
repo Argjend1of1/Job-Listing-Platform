@@ -6,12 +6,14 @@ use App\Contracts\JobServiceInterface;
 use App\Models\Job;
 use App\Models\Report;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class JobService implements JobServiceInterface
 {
-    public function filterJobs(User|null $user, ?string $query)
+    public function filterJobs(User|null $user, ?string $query): Builder
     {
         $jobsQuery = Job::query();
 
@@ -51,8 +53,8 @@ class JobService implements JobServiceInterface
     {
         DB::transaction(function () use ($job) {
             $reported = Report::where('job_id', $job->id)->first();
-            $reported?->delete();
 
+            $reported?->delete();
             $job->delete();
         });
     }
@@ -70,7 +72,7 @@ class JobService implements JobServiceInterface
         });
     }
 
-    public function getExcludedJobs(User $user)
+    public function getExcludedJobs(User $user): Collection
     {
         return $user
             ->reports()

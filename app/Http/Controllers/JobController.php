@@ -46,7 +46,7 @@ class JobController extends Controller
         );
 
         return redirect('/dashboard')->with(
-            'success', "Job Listed Successfully!"
+            "success", "Job Listed Successfully!"
         );
     }
 

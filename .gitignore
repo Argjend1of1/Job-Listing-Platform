@@ -56,3 +56,6 @@ Homestead.json
 
 # Build artifacts
 /public/build
+
+# Test Screenshots
+/tests/Browser/Screenshots

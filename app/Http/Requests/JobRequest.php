@@ -29,7 +29,7 @@ class JobRequest extends FormRequest
             'location' => ['required'],
             'schedule' => ['required', Rule::in(['Part Time', 'Full Time'])],
             'about' => ['required'],
-            'url' => ['required', 'active_url'],
+            'url' => ['required'],
             'tags' => ['nullable']
         ];
     }
