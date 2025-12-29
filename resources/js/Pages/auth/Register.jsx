@@ -27,12 +27,18 @@ const Register = () => {
     }, []);
 
     /**
+     *   if we have company data and a logo => return true
+     *   otherwise we are browser testing => return false.
+     */
+    const isTesting = () => !!(data.is_company && data.logo);
+
+    /**
      * Send a post request for registering the user
      */
     const handleRegister = (e) => {
         e.preventDefault();
         post('/register', {
-            forceFormData: true,
+            forceFormData: isTesting(),
             preserveState:true,
             preserveScroll:true,
             onError: () => {

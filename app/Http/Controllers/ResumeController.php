@@ -88,7 +88,7 @@ class ResumeController extends Controller
             !Storage::disk('local')->exists($user->resume->file_path)
         ) {
             return back()->with(
-                'error', 'An internal problem occurred. Please try again later.'
+                'error', 'An internal  problem occurred. Please try againlater.'
             );
         }
 
